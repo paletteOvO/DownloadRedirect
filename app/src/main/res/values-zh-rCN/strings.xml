@@ -1,5 +1,5 @@
 <resources>
-        <string name="app_name">下载重定冋</string>
+        <string name="app_name">下载重定向</string>
 
         <string name="label_debug">调试</string>
         <string name="switch_debug_logging">输出日志</string>
