@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Download Redirect</string>
+
+    <string name="label_debug">Debug</string>
+    <string name="switch_debug_logging">Logging</string>
+
+    <string name="label_preferences">Preferences</string>
+    <string name="switch_hide_app_icon">Hide app from launcher</string>
+    <string name="switch_white_list">Use White List</string>
+    <string name="switch_ignore_system_app">Ignore System App</string>
+    <string name="list_change_downloader">Change Downloader</string>
+    <string name="selector_downloader">Select Downloader</string>
+
+    <string name="label_filter">Filter</string>
+    <string name="filter_link">Link</string>
+    <string name="filter_app">App</string>
+
+    <string name="selector_link">Add Link</string>
+    <string name="selector_app">Add App</string>
+
+    <string name="toast_change_downloader">Change Downloader to %s</string>
+    <string name="toast_removed">Removed %s</string>
+    <string name="toast_empty_filter">Filter is empty</string>
+    <string name="toast_empty_input">Field is Empty, Cancelled</string>
+    <string name="toast_added">Added %s</string>
+    <string name="toast_link_already_exist">Link already existed</string>
+    <string name="toast_no_supported_downloader">Does Not Detected Any Supported Downloader</string>
+
+
+    <string name="button_add">Add</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="label_regex">Regular Expression</string>
+
+
+    <string name="Info">UVhWMGFHOXlPaUJ0WVc1b2IyNW5NakV4TWc9PXxSMmwwYUhWaU9pQm9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZiV0Z1YUc5dVp6SXhNVEk9fFJXMWhhV3c2SUcxaGJtaHZibWN5TVRFeVFHZHRZV2xzTG1OdmJRPT0=</string>
+</resources>

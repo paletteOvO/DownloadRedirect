@@ -1,0 +1,128 @@
+package net.manhong2112.downloadredirect
+
+import android.app.AndroidAppHelper
+import android.app.DownloadManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.pm.ApplicationInfo
+import android.net.Uri
+import de.robv.android.xposed.*
+import de.robv.android.xposed.XposedHelpers.*
+import java.io.File
+import java.util.*
+
+/**
+ * Created by manhong2112 on 23/3/2016.
+ * Main activity of xposed hook
+ */
+@Suppress("UNCHECKED_CAST")
+class XposedHook : IXposedHookZygoteInit {
+   @Throws(Throwable::class)
+   override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
+      val PackageParser = findClass("android.content.pm.PackageParser", null)
+      val m = findMethodExact(PackageParser, "parsePackage", File::class.java, Integer.TYPE)
+      m.isAccessible = true
+
+      XposedBridge.hookMethod(m, parsePackageHook)
+
+      findAndHookMethod(DownloadManager::class.java,
+              "enqueue", DownloadManager.Request::class.java,
+              enqueueHook)
+   }
+
+   private val enqueueHook = object : XC_MethodHook() {
+      @Throws(Throwable::class)
+      override fun afterHookedMethod(param: MethodHookParam) {
+         val mUri = getObjectField(param.args[0], "mUri") as Uri
+         val ctx = AndroidAppHelper.currentApplication()
+         val Pref = getPref(ctx)
+
+         if(Pref.IgnoreSystemApp &&
+           ((AndroidAppHelper.currentApplication().applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) {
+            return
+         }
+         if (Pref.ExistingDownloader.size < 1) {
+            return
+         }
+         if (Pref.UsingWhiteList) {
+            if (!Pref.AppFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
+               return
+            }
+            var not_match = true
+            Pref.LinkFilter.forEach {
+               Main.log(Pref.Debug, "Matching Link Filter-> $it")
+               if (mUri.toString().matches(it.toRegex())) {
+                  not_match = false
+                  return@forEach
+               }
+            }
+            if(not_match) {return}
+         } else {
+            if (Pref.AppFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
+               return
+            }
+            Pref.LinkFilter.forEach {
+               Main.log(Pref.Debug, "Matching Link Filter-> $it")
+               if (mUri.toString().matches(it.toRegex())) {
+                  return
+               }
+            }
+         }
+
+         Main.log(Pref.Debug, "Redirected Url -> $mUri")
+
+         val existedApi = LinkedList<Class<*>>()
+
+         for (c in Const.ApiList) {
+            if (XposedHelpers.callMethod(c.newInstance(), "isExist", ctx) as Boolean) {
+               existedApi.add(c)
+            }
+         }
+         if (existedApi.isEmpty()) return
+
+         val choseAPI = Pref.Downloader
+
+         if (!Pref.ExistingDownloader.contains(choseAPI)) {
+            XposedHelpers.callMethod(existedApi[0].newInstance(), "addDownload", ctx, mUri)
+            Pref.Downloader = Pref.ExistingDownloader[0]
+         } else {
+            XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(), "addDownload", ctx, mUri)
+         }
+
+
+         (param.thisObject as DownloadManager).remove(param.result as Long)
+         param.result = 0
+      }
+   }
+
+   private val parsePackageHook = object : XC_MethodHook() {
+      val ActivityIntentInfo = findClass("android.content.pm.PackageParser\$ActivityIntentInfo", null)
+      @Throws(Throwable::class)
+      override
+      fun afterHookedMethod(param: MethodHookParam) {
+         val activities = getObjectField(param.result, "activities") as ArrayList<*>
+         if (activities.isEmpty()) return
+         // List of Activity
+         for (activity in activities) {
+            // obj.activity
+            val info = getObjectField(activity, "info") as ActivityInfo
+            when (info.name) {
+               "com.dv.adm.pay.AEditor", "com.dv.adm.AEditor" -> {
+                  val intent = newInstance(ActivityIntentInfo, activity)
+                  callMethod(intent, "addAction", Const.ACTION_DOWNLOAD_REDIRECT)
+                  callMethod(intent, "addCategory", Intent.CATEGORY_DEFAULT)
+                  callMethod(getObjectField(activity, "intents"), "add", intent)
+               }
+            }
+         }
+      }
+   }
+
+   private fun getPref(ctx: Context): ConfigDAO {
+      val pref = XSharedPreferences(Const.PACKAGE_NAME, "pref")
+      pref.makeWorldReadable()
+      pref.reload()
+      return ConfigDAO(ctx, pref)
+   }
+}
