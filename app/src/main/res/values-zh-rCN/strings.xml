@@ -2,17 +2,17 @@
         <string name="app_name">下载重定向</string>
 
         <string name="label_debug">调试</string>
-        <string name="switch_debug_logging">输出日志</string>
+        <string name="switch_debug_logging">生成日志</string>
 
         <string name="label_preferences">设置</string>
         <string name="switch_hide_app_icon">隐藏图标</string>
         <string name="switch_white_list">使用白名单</string>
-        <string name="switch_ignore_system_app">忽略系统程式</string>
+        <string name="switch_ignore_system_app">忽略系统应用</string>
         <string name="list_change_downloader">下载器</string>
         <string name="selector_downloader">选择下载器</string>
 
         <string name="label_filter">过滤</string>
-        <string name="filter_link">链结</string>
+        <string name="filter_link">链接</string>
         <string name="filter_app">应用</string>
 
         <string name="selector_link">加入链结</string>
@@ -31,4 +31,6 @@
         <string name="button_confirm">确定</string>
         <string name="button_cancel">取消</string>
         <string name="label_regex">正规表示式</string>
+    <string name="label_about">关于</string>
+    <string name="selector_whitelist">使用白名單</string>
 </resources>

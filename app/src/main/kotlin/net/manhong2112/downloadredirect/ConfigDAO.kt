@@ -53,11 +53,18 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
          Pref.edit().putString("Downloader", s).apply()
       }
 
-   var UsingWhiteList = Pref.getBoolean("UsingWhiteList", false)
+   var UsingWhiteList_Link = Pref.getBoolean("UsingWhiteList_Link", false)
       get() = field
       set(b) {
          field = b
-         Pref.edit().putBoolean("UsingWhiteList", b).apply()
+         Pref.edit().putBoolean("UsingWhiteListLink", b).apply()
+      }
+
+   var UsingWhiteList_App = Pref.getBoolean("UsingWhiteList_App", false)
+      get() = field
+      set(b) {
+         field = b
+         Pref.edit().putBoolean("UsingWhiteListApp", b).apply()
       }
 
    var IgnoreSystemApp = Pref.getBoolean("IgnoreSystemApp", false)

@@ -6,7 +6,7 @@
 
     <string name="label_preferences">Preference Setting</string>
     <string name="switch_hide_app_icon">Hide app from launcher</string>
-    <string name="switch_white_list">Use White List</string>
+    <string name="switch_white_list">Use WhiteList</string>
     <string name="switch_ignore_system_app">Ignore System App</string>
     <string name="list_change_downloader">Change Downloader</string>
     <string name="selector_downloader">Select Downloader</string>
@@ -17,6 +17,7 @@
 
     <string name="selector_link">Add Link</string>
     <string name="selector_app">Add App</string>
+    <string name="selector_whitelist">Use WhiteList</string>
 
     <string name="toast_change_downloader">Changed Downloader to %s</string>
     <string name="toast_removed">Removed %s</string>
@@ -30,7 +31,10 @@
     <string name="button_add">Add</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">Cancel</string>
+
     <string name="label_regex">Regular Expression</string>
+    <string name="label_about">About</string>
+
 
 
     <string name="Info" translatable="false">UVhWMGFHOXlPaUJ0WVc1b2IyNW5NakV4TWc9PXxSMmwwYUhWaU9pQm9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZiV0Z1YUc5dVp6SXhNVEk9fFJXMWhhV3c2SUcxaGJtaHZibWN5TVRFeVFHZHRZV2xzTG1OdmJRPT0=</string>

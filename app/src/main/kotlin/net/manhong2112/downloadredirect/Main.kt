@@ -1,10 +1,11 @@
 package net.manhong2112.downloadredirect
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -25,11 +26,11 @@ class Main : Activity() {
       MainUi().setContentView(this)
    }
 
+
    companion object {
       fun log(DEBUG: Boolean, str: String) {
          if (DEBUG) Log.i("Xposed", "Log -> $str")
       }
-
    }
 }
 
@@ -43,7 +44,9 @@ class MainUi : AnkoComponent<Main> {
            CLabel(viewId, resources.getString(textResId))
 
    fun _RelativeLayout.CSubTitle(viewId: Int, _text: String) = textView {
-      elevation = dip(2).toFloat()
+      if(android.os.Build.VERSION.SDK_INT >= 21) {
+         elevation = dip(2).toFloat()
+      }
       id = viewId
       text = _text
       backgroundColor = 0x505050.opaque
@@ -157,6 +160,24 @@ class MainUi : AnkoComponent<Main> {
                                }
 
                if (existedApiName.size > 1) {
+                  val b = CLabel(Const.id.Pref_Using_Downloader, Pref.Downloader)
+                          .lparams {
+                             rightMargin = dip(12)
+                             height = ColumnHeight
+                             below(Const.id.Pref_Ignore_System_App)
+                             alignParentRight()
+                          }
+                  b.textColor = 0xFFFFFF.opaque
+                  b.gravity = Gravity.CENTER_VERTICAL
+                  b.onClick {
+                     selector(ctx.getString(R.string.selector_downloader), existedApiName) {
+                        i: Int ->
+                        toast(ctx.getString(R.string.toast_change_downloader, existedApiName[i]))
+                        Pref.Downloader = existedApiName[i]
+                        b.text = existedApiName[i]
+                     }
+                  }
+
                   val l = CLabel(Const.id.Pref_Downloader_Selector, R.string.list_change_downloader)
                            .lparams {
                               width = matchParent
@@ -166,17 +187,7 @@ class MainUi : AnkoComponent<Main> {
                            }
                   l.textColor = 0xFFFFFF.opaque
                   l.gravity = Gravity.CENTER_VERTICAL
-
-                  val b = CLabel(Const.id.Pref_Using_Downloader, Pref.Downloader)
-                           .lparams {
-                              rightMargin = dip(12)
-                              height = ColumnHeight
-                              below(Const.id.Pref_Ignore_System_App)
-                              alignParentRight()
-                           }
-                  b.textColor = 0xFFFFFF.opaque
-                  b.gravity = Gravity.CENTER_VERTICAL
-                  b.onClick {
+                  l.onClick {
                      selector(ctx.getString(R.string.selector_downloader), existedApiName) {
                         i: Int ->
                         toast(ctx.getString(R.string.toast_change_downloader, existedApiName[i]))
@@ -200,15 +211,29 @@ class MainUi : AnkoComponent<Main> {
                id = Const.id.Filter_List
                padding = paddingS
 
-               CSwitch(Const.id.Pref_Use_White_List, R.string.switch_white_list)
-               {
-                  view ->
-                  Pref.UsingWhiteList = (view as android.widget.Switch).isChecked
-               }.lparams {
-                  width = matchParent
-                  height = ColumnHeight
-                  below(Const.id.Pref_HideIcon_Switch)
-               }.isChecked = Pref.UsingWhiteList
+               val b = CLabel(Const.id.Pref_Use_White_List, R.string.switch_white_list)
+                       .lparams {
+                          width = matchParent
+                          height = ColumnHeight
+                       }
+               b.textColor = 0xFFFFFF.opaque
+               b.gravity = Gravity.CENTER_VERTICAL
+               b.onClick {
+                  AlertDialog.Builder(ctx)
+                          .setTitle(R.string.selector_whitelist)
+                          .setMultiChoiceItems(
+                                  arrayOf(ctx.getString(R.string.filter_link),
+                                          ctx.getString(R.string.filter_app)),
+                                  booleanArrayOf(Pref.UsingWhiteList_Link,
+                                                 Pref.UsingWhiteList_App),
+                                  {
+                                     dialog, which, isChecked ->
+                                     when(which) {
+                                        0 -> Pref.UsingWhiteList_Link = isChecked
+                                        1 -> Pref.UsingWhiteList_App = isChecked
+                                     }
+                                  }).setPositiveButton(R.string.button_confirm, null).create().show()
+               }
 
                val a = CLabel(Const.id.Link_Filter, R.string.filter_link)
                        .lparams {
@@ -340,8 +365,9 @@ class MainUi : AnkoComponent<Main> {
                   }
                }
             }
+
             // About
-            CSubTitle(Const.id.About_Label, "About").lparams {
+            CSubTitle(Const.id.About_Label, R.string.label_about).lparams {
                width = matchParent
                height = SubTitleHeight
                below(Const.id.Filter_List)
@@ -375,4 +401,6 @@ class MainUi : AnkoComponent<Main> {
       }
 
    }.view
+
+
 }

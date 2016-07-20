@@ -38,17 +38,26 @@ class XposedHook : IXposedHookZygoteInit {
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = getPref(ctx)
 
+         if (Pref.ExistingDownloader.size == 0) {
+            return
+         }
+
          if(Pref.IgnoreSystemApp &&
            ((AndroidAppHelper.currentApplication().applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) {
             return
          }
-         if (Pref.ExistingDownloader.size < 1) {
-            return
-         }
-         if (Pref.UsingWhiteList) {
+
+         if (Pref.UsingWhiteList_App) {
             if (!Pref.AppFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
                return
             }
+         } else {
+            if (Pref.AppFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
+               return
+            }
+         }
+
+         if (Pref.UsingWhiteList_Link) {
             var not_match = true
             Pref.LinkFilter.forEach {
                Main.log(Pref.Debug, "Matching Link Filter-> $it")
@@ -59,9 +68,6 @@ class XposedHook : IXposedHookZygoteInit {
             }
             if(not_match) {return}
          } else {
-            if (Pref.AppFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
-               return
-            }
             Pref.LinkFilter.forEach {
                Main.log(Pref.Debug, "Matching Link Filter-> $it")
                if (mUri.toString().matches(it.toRegex())) {
