@@ -1,0 +1,34 @@
+<resources>
+        <string name="app_name">下载重定冋</string>
+
+        <string name="label_debug">调试</string>
+        <string name="switch_debug_logging">输出日志</string>
+
+        <string name="label_preferences">设置</string>
+        <string name="switch_hide_app_icon">隐藏图标</string>
+        <string name="switch_white_list">使用白名单</string>
+        <string name="switch_ignore_system_app">忽略系统程式</string>
+        <string name="list_change_downloader">下载器</string>
+        <string name="selector_downloader">选择下载器</string>
+
+        <string name="label_filter">过滤</string>
+        <string name="filter_link">链结</string>
+        <string name="filter_app">应用</string>
+
+        <string name="selector_link">加入链结</string>
+        <string name="selector_app">加入应用</string>
+
+        <string name="toast_change_downloader">已切换下载器为 %s</string>
+        <string name="toast_removed">已移除 %s</string>
+        <string name="toast_empty_filter">过滤清单为空</string>
+        <string name="toast_empty_input">输入为空, 已取消操作</string>
+        <string name="toast_added">已加入 %s</string>
+        <string name="toast_link_already_exist">已存在于清单中</string>
+        <string name="toast_no_supported_downloader">未侦测到任何支援的下载器</string>
+
+
+        <string name="button_add">新增</string>
+        <string name="button_confirm">确定</string>
+        <string name="button_cancel">取消</string>
+        <string name="label_regex">正规表示式</string>
+</resources>
