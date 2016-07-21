@@ -57,14 +57,14 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
       get() = field
       set(b) {
          field = b
-         Pref.edit().putBoolean("UsingWhiteListLink", b).apply()
+         Pref.edit().putBoolean("UsingWhiteList_Link", b).apply()
       }
 
    var UsingWhiteList_App = Pref.getBoolean("UsingWhiteList_App", false)
       get() = field
       set(b) {
          field = b
-         Pref.edit().putBoolean("UsingWhiteListApp", b).apply()
+         Pref.edit().putBoolean("UsingWhiteList_App", b).apply()
       }
 
    var IgnoreSystemApp = Pref.getBoolean("IgnoreSystemApp", false)
@@ -75,11 +75,11 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
       }
 
    fun updateLinkFilter() {
-      Pref.edit().putStringSet("LinkList", LinkFilter.toSet()).apply()
+      Pref.edit().putStringSet("LinkFilter", LinkFilter.toSet()).apply()
    }
 
    fun updateAppFilter() {
-      Pref.edit().putStringSet("AppList", AppFilter.toSet()).apply()
+      Pref.edit().putStringSet("AppFilter", AppFilter.toSet()).apply()
    }
 
 }
