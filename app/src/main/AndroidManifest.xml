@@ -27,7 +27,7 @@
                    android:value="true" />
         <meta-data
                 android:name="xposeddescription"
-                android:value="Redirect System Download to ADM/LoaderDroid" />
+                android:value="Redirect download manager of system to ADM or LoaderDroid" />
         <meta-data android:name="xposedminversion" android:value="54" />
 
     </application>

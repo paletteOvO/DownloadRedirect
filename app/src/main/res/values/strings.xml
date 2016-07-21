@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Download Redirect</string>
+    <string name="app_name">Download Redirection</string>
 
     <string name="label_debug">Debug</string>
     <string name="switch_debug_logging">Logging</string>
