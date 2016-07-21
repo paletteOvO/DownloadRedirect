@@ -346,20 +346,21 @@ class MainUi : AnkoComponent<Main> {
                z.textColor = 0xFFFFFF.opaque
                z.textSize = sp(10).toFloat()
                z.onClick {
-                  val p = ctx.packageManager.getInstalledPackages(0)
+                  val packageName = mutableListOf<String>()
                   val appNameList = mutableListOf<String>()
-                  for(l in p) {
+                  for(l in ctx.packageManager.getInstalledPackages(0)) {
                      if(Pref.IgnoreSystemApp &&
                        ((l.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) {
                         continue
                      }
                      appNameList.add(ctx.packageManager.getApplicationLabel(l.applicationInfo).toString())
+                     packageName.add(l.packageName)
                   }
                   selector(ctx.getString(R.string.selector_app), appNameList) {
                      i: Int ->
                      toast(ctx.getString(R.string.toast_added, appNameList[i]))
-                     Main.log(Pref.Debug, "Added \"${appNameList[i]} | ${p[i].packageName}\" to filter")
-                     Pref.AppFilter.add(p[i].packageName)
+                     Main.log(Pref.Debug, "Added \"${appNameList[i]} | ${packageName[i]}\" to filter")
+                     Pref.AppFilter.add(packageName[i])
                      Pref.AppFilter.sort()
                      Pref.updateAppFilter()
                   }
