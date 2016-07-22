@@ -16,12 +16,12 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
       get() = field
 
    val LinkFilter: MutableList<String> =
-           (Pref.getStringSet("LinkFilter", setOf<String>()) ?: setOf<String>())
+           (Pref.getStringSet("LinkFilter", null) ?: setOf<String>())
            .sorted().toMutableList()
       get() = field
 
    val AppFilter: MutableList<String> =
-           (Pref.getStringSet("AppFilter", setOf<String>()) ?: setOf<String>())
+           (Pref.getStringSet("AppFilter", null) ?: setOf<String>())
            .sorted().toMutableList()
       get() = field
 

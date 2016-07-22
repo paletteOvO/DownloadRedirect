@@ -38,8 +38,8 @@ android {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 24
-        versionCode 9
-        versionName "1.1.3"
+        versionCode 10
+        versionName "1.1.4"
     }
 }
 

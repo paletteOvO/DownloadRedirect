@@ -4,6 +4,7 @@ import android.app.AndroidAppHelper
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.net.Uri
@@ -88,12 +89,16 @@ class XposedHook : IXposedHookZygoteInit {
          if (existedApi.isEmpty()) return
 
          val choseAPI = Pref.Downloader
-
+         val v:Boolean
          if (!Pref.ExistingDownloader.contains(choseAPI)) {
-            XposedHelpers.callMethod(existedApi[0].newInstance(), "addDownload", ctx, mUri)
+            v = XposedHelpers.callMethod(existedApi[0].newInstance(), "addDownload", ctx, mUri) as Boolean
             Pref.Downloader = Pref.ExistingDownloader[0]
          } else {
-            XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(), "addDownload", ctx, mUri)
+            v = XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(), "addDownload", ctx, mUri) as Boolean
+         }
+         Main.log(Pref.Debug, "Redirection: ${if(v) "Success" else "Failed"}")
+         if(!v) {
+            return
          }
 
 
@@ -115,9 +120,13 @@ class XposedHook : IXposedHookZygoteInit {
             val info = getObjectField(activity, "info") as ActivityInfo
             when (info.name) {
                "com.dv.adm.pay.AEditor", "com.dv.adm.AEditor" -> {
-                  val intent = newInstance(ActivityIntentInfo, activity)
-                  callMethod(intent, "addAction", Const.ACTION_DOWNLOAD_REDIRECT)
-                  callMethod(intent, "addCategory", Intent.CATEGORY_DEFAULT)
+                  Main.log(true, "Inject Redirect Intent")
+                  val intent = newInstance(ActivityIntentInfo, activity) as IntentFilter
+                  intent.addDataScheme("http")
+                  intent.addDataScheme("https")
+                  intent.addAction(Const.ACTION_DOWNLOAD_REDIRECT)
+                  intent.addCategory(Intent.CATEGORY_DEFAULT)
+
                   callMethod(getObjectField(activity, "intents"), "add", intent)
                }
             }
