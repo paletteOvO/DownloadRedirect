@@ -94,7 +94,8 @@ class XposedHook : IXposedHookZygoteInit {
             v = XposedHelpers.callMethod(existedApi[0].newInstance(), "addDownload", ctx, mUri) as Boolean
             Pref.Downloader = Pref.ExistingDownloader[0]
          } else {
-            v = XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(), "addDownload", ctx, mUri) as Boolean
+            v = XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(),
+                    "addDownload", ctx, mUri) as Boolean
          }
          Main.log(Pref.Debug, "Redirection: ${if(v) "Success" else "Failed"}")
          if(!v) {
