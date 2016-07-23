@@ -2,6 +2,7 @@ package net.manhong2112.downloadredirect
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.util.*
 
 /**
  * Created by manhong2112 on 18/7/2016.
@@ -15,14 +16,12 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
            .map { it.getMethod("getName").invoke(it.newInstance()) as String }
       get() = field
 
-   val LinkFilter: MutableList<String> =
-           (Pref.getStringSet("LinkFilter", null) ?: setOf<String>())
-           .sorted().toMutableList()
+   val LinkFilter: HashSet<String> =
+           Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
       get() = field
 
-   val AppFilter: MutableList<String> =
-           (Pref.getStringSet("AppFilter", null) ?: setOf<String>())
-           .sorted().toMutableList()
+   val AppFilter: HashSet<String> =
+           Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
       get() = field
 
 

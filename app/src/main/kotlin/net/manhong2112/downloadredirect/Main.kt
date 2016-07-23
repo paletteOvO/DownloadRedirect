@@ -225,14 +225,14 @@ class MainUi : AnkoComponent<Main> {
             a.textColor = 0xFFFFFF.opaque
             a.onClick {
                if (!Pref.LinkFilter.isEmpty()) {
-                  selector(ctx.getString(R.string.selector_link),
-                          Pref.LinkFilter) {
+                  val lf = Pref.LinkFilter.sorted()
+                  selector(ctx.getString(R.string.selector_link), lf) {
                      i: Int ->
-                     toast(ctx.getString(R.string.toast_removed,
-                             Pref.LinkFilter[i]))
+                     val x = lf[i]
+                     toast(ctx.getString(R.string.toast_removed, x))
                      Main.log(Pref.Debug,
-                             "Removed \"${Pref.LinkFilter[i]}\" from filter")
-                     Pref.LinkFilter.removeAt(i)
+                             "Removed \"${x}\" from filter")
+                     Pref.LinkFilter.remove(x)
                      Pref.updateLinkFilter()
                   }
                } else {
@@ -274,7 +274,6 @@ class MainUi : AnkoComponent<Main> {
                                  toast(ctx.getString(R.string.toast_added, d))
                                  Main.log(Pref.Debug, "Added \"$d\" to filter")
                                  Pref.LinkFilter.add(d)
-                                 Pref.LinkFilter.sort()
                                  Pref.updateLinkFilter()
                               }
                            }
@@ -295,17 +294,20 @@ class MainUi : AnkoComponent<Main> {
             y.textColor = 0xFFFFFF.opaque
             y.onClick {
                if (!Pref.AppFilter.isEmpty()) {
-                  val appNameList = ArrayList<String>()
+                  val appNameList = arrayListOf<String>()
                   Pref.AppFilter.forEach {
                      val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
-                     appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString())
+                     appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " +
+                                     it)
                   }
+                  appNameList.sortBy { it -> it.toLowerCase() }
                   selector(ctx.getString(R.string.selector_app), appNameList) {
                      i: Int ->
-                     toast(ctx.getString(R.string.toast_removed, appNameList[i]))
+                     val app = appNameList[i].split("\n ")
+                     toast(ctx.getString(R.string.toast_removed, app[0]))
                      Main.log(Pref.Debug,
-                             "Removed \"${appNameList[i]} | ${Pref.AppFilter[i]}\" from filter")
-                     Pref.AppFilter.removeAt(i)
+                             "Removed \"${app[0]} | ${app[1]}\" from filter")
+                     Pref.AppFilter.remove(app[1])
                      Pref.updateAppFilter()
                   }
                } else {
@@ -359,7 +361,6 @@ class MainUi : AnkoComponent<Main> {
                                     Main.log(Pref.Debug, "Added \"${item[0]} | ${item[1]}\" to filter")
                                     toast(ctx.getString(R.string.toast_added, item[0]))
                                     Pref.AppFilter.add(item[1])
-                                    Pref.AppFilter.sort()
                                     Pref.updateAppFilter()
                                  }
                               }
