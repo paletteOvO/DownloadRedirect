@@ -10,46 +10,26 @@ import android.net.Uri
  * Modify from LoaderDroidPublicApi
  */
 class LoaderDroidApi : DLApi() {
-    override fun getName(): String {
-        return "LoaderDroid"
-    }
+   override val APP_NAME = "LoaderDroid"
+   private val ACTION_ADD_LOADING = "org.zloy.android.downloader.action.ADD_LOADING"
+   override val PACKAGE_NAME = "org.zloy.android.downloader"
 
-    override fun addDownload(ctx: Context, url: Uri): Boolean {
-        if (!isExist(ctx)) {
-            return false
-        }
+   override fun addDownload(ctx: Context, url: Uri): Boolean {
+      if (!isExist(ctx)) {
+         return false
+      }
 
-        val intent = Intent(ACTION_ADD_LOADING, url)
-        intent.putExtra("ask_for_directory", true)
-        intent.putExtra("allowed_connection", 1)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      val intent = Intent(ACTION_ADD_LOADING, url)
+      intent.putExtra("ask_for_directory", true)
+      intent.putExtra("allowed_connection", 1)
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        try {
-            ctx.startActivity(intent)
-            return true
-        } catch (e: ActivityNotFoundException) {
-            return false
-        }
+      try {
+         ctx.startActivity(intent)
+         return true
+      } catch (e: ActivityNotFoundException) {
+         return false
+      }
 
-    }
-
-    override fun getVersion(ctx: Context): Int {
-        val packageManager = ctx.packageManager ?: return -1
-        val packages = packageManager.getInstalledPackages(0) ?: return -1
-        for (info in packages) {
-            if (info != null && LOADER_DROID_PACKAGE == info.packageName) {
-                return info.versionCode
-            }
-
-        }
-        return -1
-    }
-
-
-    override fun isExist(ctx: Context): Boolean {
-        return getVersion(ctx) != -1
-    }
-
-    private val ACTION_ADD_LOADING = "org.zloy.android.downloader.action.ADD_LOADING"
-    private val LOADER_DROID_PACKAGE = "org.zloy.android.downloader"
+   }
 }

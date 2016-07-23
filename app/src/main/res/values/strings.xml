@@ -24,7 +24,7 @@
     <string name="toast_empty_filter">Filter list is empty</string>
     <string name="toast_empty_input">Field is empty, Cancelled</string>
     <string name="toast_added">Added %s</string>
-    <string name="toast_link_already_exist">Already existed in filter</string>
+    <string name="toast_rule_already_exist">Already existed in filter</string>
     <string name="toast_no_supported_downloader">Does Not Detected Any Supported Downloader</string>
 
 
@@ -34,6 +34,7 @@
 
     <string name="label_regex">Regular Expression</string>
     <string name="label_about">About</string>
+    <string name="label_search">Search</string>
 
 
 

@@ -38,14 +38,12 @@ class XposedHook : IXposedHookZygoteInit {
          val mUri = getObjectField(param.args[0], "mUri") as Uri
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = getPref(ctx)
-
-         if (Pref.ExistingDownloader.size == 0) {
-            return
-         }
-
-         if(Pref.IgnoreSystemApp &&
-           ((AndroidAppHelper.currentApplication().applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) {
-            return
+         when(true) {
+            Pref.ExistingDownloader.size == 0 ->
+                    return
+            (Pref.IgnoreSystemApp &&
+                    ((ctx.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) ->
+                    return
          }
 
          if (Pref.UsingWhiteList_App) {
@@ -86,7 +84,9 @@ class XposedHook : IXposedHookZygoteInit {
                existedApi.add(c)
             }
          }
-         if (existedApi.isEmpty()) return
+         if (existedApi.isEmpty()) {
+            return
+         }
 
          val choseAPI = Pref.Downloader
          val v:Boolean
@@ -100,8 +100,6 @@ class XposedHook : IXposedHookZygoteInit {
          if(!v) {
             return
          }
-
-
          (param.thisObject as DownloadManager).remove(param.result as Long)
          param.result = 0
       }

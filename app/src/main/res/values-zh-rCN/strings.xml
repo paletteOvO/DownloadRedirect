@@ -23,7 +23,7 @@
         <string name="toast_empty_filter">过滤清单为空</string>
         <string name="toast_empty_input">输入为空, 已取消操作</string>
         <string name="toast_added">已加入 %s</string>
-        <string name="toast_link_already_exist">已存在于清单中</string>
+        <string name="toast_rule_already_exist">已存在于清单中</string>
         <string name="toast_no_supported_downloader">未侦测到任何支援的下载器</string>
 
 
@@ -33,4 +33,5 @@
         <string name="label_regex">正规表示式</string>
     <string name="label_about">关于</string>
     <string name="selector_whitelist">使用白名單</string>
+    <string name="label_search">搜索</string>
 </resources>

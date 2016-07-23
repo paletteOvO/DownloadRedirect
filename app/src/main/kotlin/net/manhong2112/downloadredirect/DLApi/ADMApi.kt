@@ -11,12 +11,9 @@ import net.manhong2112.downloadredirect.Const.ACTION_DOWNLOAD_REDIRECT
  */
 
 class ADMApi : DLApi() {
-   override fun getName(): String {
-      return "ADM"
-   }
-
-   private val ADM_PACKAGE_NAME = "com.dv.adm"
-   private val ADM_PACKAGE_NAME_PAY = "com.dv.adm.pay"
+   override val APP_NAME = "ADM"
+   override val PACKAGE_NAME = "com.dv.adm"
+   val PACKAGE_NAME_PAY = "com.dv.adm.pay"
 
    override fun getVersion(ctx: Context): Int {
       val packageManager = ctx.packageManager ?: return -1
@@ -24,14 +21,11 @@ class ADMApi : DLApi() {
 
       for (info in packages) {
          when (info.packageName) {
-            ADM_PACKAGE_NAME, ADM_PACKAGE_NAME_PAY -> return info.versionCode
+            PACKAGE_NAME, PACKAGE_NAME_PAY ->
+               return info.versionCode
          }
       }
       return -1
-   }
-
-   override fun isExist(ctx: Context): Boolean {
-      return getVersion(ctx) != -1
    }
 
    override fun addDownload(ctx: Context, url: Uri): Boolean {

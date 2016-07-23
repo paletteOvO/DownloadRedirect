@@ -62,7 +62,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     // compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "org.jetbrains.anko:anko-sdk23:$anko_version"
-    compile "org.jetbrains.anko:anko-common:$anko_version"
+    // compile "org.jetbrains.anko:anko-common:$anko_version"
     // compile "com.android.support:support-v4:23.0.+"
     testCompile 'junit:junit:4.12'
     provided files('lib/XposedBridgeApi-54.jar')
