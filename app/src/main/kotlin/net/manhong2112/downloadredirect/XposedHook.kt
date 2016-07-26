@@ -113,6 +113,7 @@ class XposedHook : IXposedHookZygoteInit {
       fun afterHookedMethod(param: MethodHookParam) {
          if(param.result == null) {
             Main.log(true, "${param.args[0]}")
+            return
          }
          val activities = getObjectField(param.result, "activities") as ArrayList<*>
          if (activities.isEmpty()) return
