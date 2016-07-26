@@ -15,6 +15,9 @@
     <string name="filter_link">Link</string>
     <string name="filter_app">App</string>
 
+    <string name="list_filter_link">Added Link</string>
+    <string name="list_filter_app">Added App</string>
+
     <string name="selector_link">Add Link</string>
     <string name="selector_app">Add App</string>
     <string name="selector_whitelist">Use WhiteList</string>

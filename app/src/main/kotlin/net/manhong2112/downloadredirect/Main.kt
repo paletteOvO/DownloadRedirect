@@ -226,12 +226,12 @@ class MainUi : AnkoComponent<Main> {
             a.onClick {
                if (!Pref.LinkFilter.isEmpty()) {
                   val lf = Pref.LinkFilter.sorted()
-                  selector(ctx.getString(R.string.selector_link), lf) {
+                  selector(ctx.getString(R.string.list_filter_link), lf) {
                      i: Int ->
                      val x = lf[i]
                      toast(ctx.getString(R.string.toast_removed, x))
                      Main.log(Pref.Debug,
-                             "Removed \"${x}\" from filter")
+                             "Removed \"$x\" from filter")
                      Pref.LinkFilter.remove(x)
                      Pref.updateLinkFilter()
                   }
@@ -301,7 +301,7 @@ class MainUi : AnkoComponent<Main> {
                                      it)
                   }
                   appNameList.sortBy { it -> it.toLowerCase() }
-                  selector(ctx.getString(R.string.selector_app), appNameList) {
+                  selector(ctx.getString(R.string.list_filter_app), appNameList) {
                      i: Int ->
                      val app = appNameList[i].split("\n ")
                      toast(ctx.getString(R.string.toast_removed, app[0]))

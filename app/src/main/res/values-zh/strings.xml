@@ -34,4 +34,6 @@
     <string name="label_about">關於</string>
     <string name="selector_whitelist">使用白名單</string>
     <string name="label_search">搜索</string>
+    <string name="list_filter_link">鏈接</string>
+    <string name="list_filter_app">應用程式</string>
 </resources>
