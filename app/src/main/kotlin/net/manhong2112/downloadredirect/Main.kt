@@ -29,7 +29,7 @@ class Main : Activity() {
 
    companion object {
       fun log(DEBUG: Boolean, str: String) {
-         if (DEBUG) Log.i("Xposed", "Log -> $str")
+         if (DEBUG) Log.i("Xposed", "DownloadRedirect -> $str")
       }
    }
 }
@@ -409,7 +409,7 @@ class MainUi : AnkoComponent<Main> {
                        width = matchParent
                        below(Const.id.About_Version)
                     }
-            CLabel(Const.id.About_Email, "${String(android.util.Base64.decode(s[i++ + ++i], 0))}")
+            CLabel(Const.id.About_Email, "${String(android.util.Base64.decode(s[(i++).plus(++i)], 0))}")
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
