@@ -301,7 +301,7 @@ class MainUi : AnkoComponent<Main> {
                      appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " +
                                      it)
                   }
-                  appNameList.sortBy { it -> it.toLowerCase() }
+                  appNameList.sortBy(String::toLowerCase)
                   selector(ctx.getString(R.string.list_filter_app), appNameList) {
                      i: Int ->
                      val app = appNameList[i].split("\n ")
@@ -342,7 +342,7 @@ class MainUi : AnkoComponent<Main> {
                           ctx.packageManager.getApplicationLabel(l.applicationInfo).toString() + "\n " +
                                   l.packageName)
                }
-               appNameList.sortBy { it -> it.toLowerCase() }
+               appNameList.sortBy(String::toLowerCase)
                alert {
                   customView {
                      verticalLayout {
