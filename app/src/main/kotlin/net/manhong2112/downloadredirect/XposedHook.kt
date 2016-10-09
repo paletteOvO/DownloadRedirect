@@ -8,8 +8,12 @@ import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.net.Uri
-import de.robv.android.xposed.*
+import de.robv.android.xposed.IXposedHookZygoteInit
+import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XSharedPreferences
+import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers.*
+import net.manhong2112.downloadredirect.DLApi.DLApi
 import java.io.File
 import java.util.*
 
@@ -80,7 +84,7 @@ class XposedHook : IXposedHookZygoteInit {
          val existedApi = LinkedList<Class<*>>()
 
          for (c in Const.ApiList) {
-            if (XposedHelpers.callMethod(c.newInstance(), "isExist", ctx) as Boolean) {
+            if ((c.newInstance() as DLApi).isExist(ctx)) {
                existedApi.add(c)
             }
          }
@@ -91,11 +95,11 @@ class XposedHook : IXposedHookZygoteInit {
          val choseAPI = Pref.Downloader
          val v:Boolean
          if (!Pref.ExistingDownloader.contains(choseAPI)) {
-            v = XposedHelpers.callMethod(existedApi[0].newInstance(), "addDownload", ctx, mUri) as Boolean
+            v = (existedApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
+
             Pref.Downloader = Pref.ExistingDownloader[0]
          } else {
-            v = XposedHelpers.callMethod(existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance(),
-                    "addDownload", ctx, mUri) as Boolean
+            v = (existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri)
          }
          Main.log(Pref.Debug, "Redirection: ${if(v) "Success" else "Failed"}")
          if(!v) {

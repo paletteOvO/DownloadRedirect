@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -29,7 +30,7 @@ class Main : Activity() {
 
    companion object {
       fun log(DEBUG: Boolean, str: String) {
-         if (DEBUG) Log.i("Xposed", "DownloadRedirect -> $str")
+         if (DEBUG) Log.d("Xposed", "DownloadRedirect -> $str")
       }
    }
 }
@@ -403,19 +404,19 @@ class MainUi : AnkoComponent<Main> {
                     }
             val s = (String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|"))
             var i = 1
-            CLabel(Const.id.About_Author, "${String(android.util.Base64.decode(s[--i], 0))}")
+            CLabel(Const.id.About_Author, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Version)
                     }
-            CLabel(Const.id.About_Email, "${String(android.util.Base64.decode(s[(i++).plus(++i)], 0))}")
+            CLabel(Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Author)
                     }
-            CLabel(Const.id.About_Github, "${String(android.util.Base64.decode(s[--i], 0))}")
+            CLabel(Const.id.About_Github, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent

@@ -38,13 +38,13 @@ android {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 24
-        versionCode 11
-        versionName "1.1.5"
+        versionCode 12
+        versionName "1.1.6"
     }
 }
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
+    ext.kotlin_version = '1.0.4'
     ext.anko_version = '0.9'
 
     repositories {
