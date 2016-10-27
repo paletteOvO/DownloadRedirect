@@ -6,7 +6,7 @@
 
     <string name="label_preferences">Preference Setting</string>
     <string name="switch_hide_app_icon">Hide app from launcher</string>
-    <string name="switch_white_list">Use WhiteList</string>
+    <string name="switch_white_list">Switch WhiteList</string>
     <string name="switch_ignore_system_app">Ignore System App</string>
     <string name="list_change_downloader">Change Downloader</string>
     <string name="selector_downloader">Select Downloader</string>

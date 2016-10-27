@@ -6,7 +6,7 @@
 
         <string name="label_preferences">设置</string>
         <string name="switch_hide_app_icon">隐藏图标</string>
-        <string name="switch_white_list">使用白名单</string>
+        <string name="switch_white_list">开关白名单</string>
         <string name="switch_ignore_system_app">忽略系统应用</string>
         <string name="list_change_downloader">下载器</string>
         <string name="selector_downloader">选择下载器</string>
