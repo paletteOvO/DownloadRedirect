@@ -96,7 +96,6 @@ class XposedHook : IXposedHookZygoteInit {
          val v:Boolean
          if (!Pref.ExistingDownloader.contains(choseAPI)) {
             v = (existedApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
-
             Pref.Downloader = Pref.ExistingDownloader[0]
          } else {
             v = (existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri)

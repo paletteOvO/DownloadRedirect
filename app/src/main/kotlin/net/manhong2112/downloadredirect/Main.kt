@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.widget.ArrayAdapter
@@ -26,6 +27,10 @@ class Main : Activity() {
    override fun onCreate(bundle: Bundle?) {
       super.onCreate(bundle)
       MainUi().setContentView(this)
+   }
+
+   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+      return super.onCreateOptionsMenu(menu)
    }
 
    companion object {
@@ -70,7 +75,17 @@ class MainUi : AnkoComponent<Main> {
    fun _RelativeLayout.CSwitch(viewId: Int, textResId: Int, onClickF: (View?) -> Unit) =
            CSwitch(viewId, resources.getString(textResId), onClickF)
 
-   override fun createView(ui: AnkoContext<Main>) = ui.apply {
+   private fun isPackageInstalled(packagename: String, packageManager: PackageManager): Boolean {
+      try {
+         packageManager.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES)
+         return true
+      } catch (e: PackageManager.NameNotFoundException) {
+         return false
+      }
+
+   }
+
+   override fun createView(ui: AnkoContext<Main>) = with(ui) {
       val Pref = ConfigDAO(ctx, ctx.getSharedPreferences("pref", 1))
 
       val ColumnHeight = dip(48)
@@ -79,6 +94,7 @@ class MainUi : AnkoComponent<Main> {
       if (Pref.ExistingDownloader.size == 0) {
          toast(R.string.toast_no_supported_downloader)
       }
+
       scrollView {
          relativeLayout {
             lparams {
@@ -297,9 +313,14 @@ class MainUi : AnkoComponent<Main> {
                if (!Pref.AppFilter.isEmpty()) {
                   val appNameList = arrayListOf<String>()
                   Pref.AppFilter.forEach {
-                     val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
-                     appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " +
-                                     it)
+                     if(!isPackageInstalled(it, ctx.packageManager)) {
+                        Pref.AppFilter.remove(it)
+                     } else {
+                        val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
+                        appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " +
+                                it)
+                     }
+                     Pref.updateAppFilter()
                   }
                   appNameList.sortBy(String::toLowerCase)
                   selector(ctx.getString(R.string.list_filter_app), appNameList) {
@@ -425,6 +446,6 @@ class MainUi : AnkoComponent<Main> {
 
          }
       }
-   }.view
+   }
 
 }
