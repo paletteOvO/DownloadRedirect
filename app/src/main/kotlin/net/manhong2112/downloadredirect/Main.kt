@@ -75,9 +75,9 @@ class MainUi : AnkoComponent<Main> {
    fun _RelativeLayout.CSwitch(viewId: Int, textResId: Int, onClickF: (View?) -> Unit) =
            CSwitch(viewId, resources.getString(textResId), onClickF)
 
-   private fun isPackageInstalled(packagename: String, packageManager: PackageManager): Boolean {
+   private fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
       try {
-         packageManager.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES)
+         packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
          return true
       } catch (e: PackageManager.NameNotFoundException) {
          return false
