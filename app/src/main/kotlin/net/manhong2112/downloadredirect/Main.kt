@@ -3,7 +3,6 @@ package net.manhong2112.downloadredirect
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ComponentName
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -14,6 +13,7 @@ import android.view.Menu
 import android.view.View
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.widget.ArrayAdapter
+import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -152,12 +152,10 @@ class MainUi : AnkoComponent<Main> {
             val existedApiName =
                     Const.ApiList
                             .filter {
-                               it.getMethod("isExist", Context::class.java)
-                                       .invoke(it.newInstance(), ctx) as Boolean
+                               (it.newInstance() as DLApi).isExist(ctx)
                             }
                             .map {
-                               it.getMethod("getName")
-                                       .invoke(it.newInstance()) as String
+                               (it.newInstance() as DLApi).getName()
                             }
 
             if (existedApiName.size > 1) {
