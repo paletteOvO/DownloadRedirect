@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Redirecionador de Download</string>
+
+    <string name="label_debug">Debug</string>
+    <string name="switch_debug_logging">Logging</string>
+
+    <string name="label_preferences">Configurações de preferência</string>
+    <string name="switch_hide_app_icon">Esconder aplicativo do lançador</string>
+    <string name="switch_white_list">Usar Lista Branca</string>
+    <string name="switch_ignore_system_app">Ignorar Apps do Sistema</string>
+    <string name="list_change_downloader">Alterar App Downloader</string>
+    <string name="selector_downloader">Selecionar App Downloader</string>
+
+    <string name="label_filter">Filtro</string>
+    <string name="filter_link">Link</string>
+    <string name="filter_app">App</string>
+
+    <string name="list_filter_link">Link Adicionado</string>
+    <string name="list_filter_app">App Adicionado</string>
+
+    <string name="selector_link">Adicionar Link</string>
+    <string name="selector_app">Adicionar App</string>
+    <string name="selector_whitelist">Usar Lista Branca</string>
+
+    <string name="toast_change_downloader">App Downloader alterado para %s</string>
+    <string name="toast_removed">%s Removido</string>
+    <string name="toast_empty_filter">A Lista de filtros está vazio</string>
+    <string name="toast_empty_input">Cancelado, o campo está vazio</string>
+    <string name="toast_added">%s Adicionado</string>
+    <string name="toast_rule_already_exist">Já existe no filtro</string>
+    <string name="toast_no_supported_downloader">Nenhum App Downloader Suportado foi encontrado</string>
+
+
+    <string name="button_add">Adicionar</string>
+    <string name="button_confirm">Confirmar</string>
+    <string name="button_cancel">Cancelar</string>
+
+    <string name="label_regex">Expressão regular</string>
+    <string name="label_about">Sobre</string>
+    <string name="label_search">Pesquisar</string>
+
+
+
+</resources>
