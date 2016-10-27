@@ -39,7 +39,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 24
         versionCode 12
-        versionName "1.1.6"
+        versionName "(｀・ω・´) 1.1.6"
     }
 }
 
