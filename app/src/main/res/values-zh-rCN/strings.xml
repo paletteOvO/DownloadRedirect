@@ -15,6 +15,9 @@
         <string name="filter_link">链接</string>
         <string name="filter_app">应用</string>
 
+        <string name="dialog_remove_confirm">你确定要从名单中移除 \"%s"?</string>
+
+
         <string name="selector_link">加入链结</string>
         <string name="selector_app">加入应用</string>
 

@@ -11,7 +11,7 @@
     <string name="list_change_downloader">Change Downloader</string>
     <string name="selector_downloader">Select Downloader</string>
 
-    <string name="dialog_remove_confirm">Are you sure you want to remove "%s" from the list?</string>
+    <string name="dialog_remove_confirm">Are you sure you want to remove \"%s\" from the list?</string>
 
     <string name="label_filter">Filter</string>
     <string name="filter_link">Link</string>

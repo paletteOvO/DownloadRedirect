@@ -11,6 +11,8 @@
     <string name="list_change_downloader">下載器</string>
     <string name="selector_downloader">選擇下載器</string>
 
+    <string name="dialog_remove_confirm">你確定要從名單中移除 \"%s\"?</string>
+
     <string name="label_filter">過濾</string>
     <string name="filter_link">鏈接</string>
     <string name="filter_app">應用程式</string>
