@@ -13,10 +13,8 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Switch
-import android.widget.TextView
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
@@ -350,15 +348,15 @@ class MainUi : AnkoComponent<Main> {
                         customView {
                            verticalLayout {
                               padding = dip(24)
-                              val x = appNameList[i].split("\n ")
+                              val app = appNameList[i].split("\n ")
                               textView {
-                                 text = ctx.getString(R.string.dialog_remove_confirm, x[0])
+                                 text = ctx.getString(R.string.dialog_remove_confirm, app[0])
                               }
                               positiveButton(R.string.button_confirm) {
-                                 toast(ctx.getString(R.string.toast_removed, x[0]))
+                                 toast(ctx.getString(R.string.toast_removed, app[0]))
                                  Main.log(Pref.Debug,
-                                         "Removed \"${x[0]} | ${x[1]}\" from filter")
-                                 Pref.AppFilter.remove(x[1])
+                                         "Removed \"${app[0]} | ${app[1]}\" from filter")
+                                 Pref.AppFilter.remove(app[1])
                                  Pref.updateAppFilter()
                               }
                               negativeButton(R.string.button_cancel) {}
@@ -466,34 +464,27 @@ class MainUi : AnkoComponent<Main> {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Label)
-                    }.textColor = resources.getColor(android.R.color.primary_text_dark, null)
+                    }.textColor = 0x9E9E9E.opaque
             val s = String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|")
             var i = 1
-            val AboutLabelStyle = { view: View ->
-               if(android.os.Build.VERSION.SDK_INT >= 23) {
-                  (view as TextView).textColor = resources.getColor(android.R.color.primary_text_dark, null)
-               } else {
-                  (view as TextView).textColor = resources.getColor(android.R.color.primary_text_dark)
-               }
-            }
             CLabel(Const.id.About_Author, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Version)
-                    }.applyRecursively(AboutLabelStyle)
+                    }.textColor = 0x9E9E9E.opaque
             CLabel(Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Author)
-                    }.applyRecursively(AboutLabelStyle)
+                    }.textColor = 0x9E9E9E.opaque
             CLabel(Const.id.About_Github, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Email)
-                    }.applyRecursively(AboutLabelStyle)
+                    }.textColor = 0x9E9E9E.opaque
 
          }
       }
