@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.net.Uri
+import android.util.DisplayMetrics
 import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XSharedPreferences
@@ -15,6 +16,7 @@ import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers.*
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import java.io.File
+import java.lang.reflect.Method
 import java.util.*
 
 /**
@@ -25,15 +27,30 @@ import java.util.*
 class XposedHook : IXposedHookZygoteInit {
    @Throws(Throwable::class)
    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
-      val PackageParser = findClass("android.content.pm.PackageParser", null)
-      val m = findMethodExact(PackageParser, "parsePackage", File::class.java, Integer.TYPE)
-      m.isAccessible = true
-
-      XposedBridge.hookMethod(m, parsePackageHook)
 
       findAndHookMethod(DownloadManager::class.java,
               "enqueue", DownloadManager.Request::class.java,
               enqueueHook)
+
+      val PackageParser = findClass("android.content.pm.PackageParser", null)
+      val m: Method
+      try {
+         if(android.os.Build.VERSION.SDK_INT >= 21) {
+            m = findMethodExact(PackageParser, "parsePackage", File::class.java, Integer.TYPE)
+         } else {
+            m = findMethodExact(PackageParser, "parsePackage",
+                    File::class.java,
+                    String::class.java,
+                    DisplayMetrics::class.java,
+                    Integer.TYPE)
+         }
+         m.isAccessible = true
+
+         XposedBridge.hookMethod(m, parsePackageHook)
+      } catch (e: NoSuchMethodError) {
+         Main.log(true, "Failed to Hook parsePackage")
+      }
+
    }
 
    private val enqueueHook = object : XC_MethodHook() {
