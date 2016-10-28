@@ -13,8 +13,10 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Switch
+import android.widget.TextView
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
@@ -467,24 +469,31 @@ class MainUi : AnkoComponent<Main> {
                     }.textColor = resources.getColor(android.R.color.primary_text_dark, null)
             val s = String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|")
             var i = 1
+            val AboutLabelStyle = { view: View ->
+               if(android.os.Build.VERSION.SDK_INT >= 23) {
+                  (view as TextView).textColor = resources.getColor(android.R.color.primary_text_dark, null)
+               } else {
+                  (view as TextView).textColor = resources.getColor(android.R.color.primary_text_dark)
+               }
+            }
             CLabel(Const.id.About_Author, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Version)
-                    }.textColor = resources.getColor(android.R.color.primary_text_dark, null)
+                    }.applyRecursively(AboutLabelStyle)
             CLabel(Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Author)
-                    }.textColor = resources.getColor(android.R.color.primary_text_dark, null)
+                    }.applyRecursively(AboutLabelStyle)
             CLabel(Const.id.About_Github, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Email)
-                    }.textColor = resources.getColor(android.R.color.primary_text_dark, null)
+                    }.applyRecursively(AboutLabelStyle)
 
          }
       }
