@@ -6,7 +6,7 @@
 
         <string name="label_preferences">设置</string>
         <string name="switch_hide_app_icon">隐藏图标</string>
-        <string name="switch_white_list">开关白名单</string>
+        <string name="switch_white_list">开启白名单</string>
         <string name="switch_ignore_system_app">忽略系统应用</string>
         <string name="list_change_downloader">下载器</string>
         <string name="selector_downloader">选择下载器</string>
@@ -35,7 +35,7 @@
         <string name="button_cancel">取消</string>
         <string name="label_regex">正规表示式</string>
     <string name="label_about">关于</string>
-    <string name="selector_whitelist">使用白名單</string>
+    <string name="selector_whitelist">开启白名单</string>
     <string name="label_search">搜索</string>
     <string name="list_filter_link">链接</string>
     <string name="list_filter_app">应用</string>
