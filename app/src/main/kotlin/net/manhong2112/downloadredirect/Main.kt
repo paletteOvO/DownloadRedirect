@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.widget.ArrayAdapter
 import android.widget.Switch
+import net.manhong2112.downloadredirect.Const.color
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
@@ -72,7 +73,7 @@ class MainUi : AnkoComponent<Main> {
       text = _text
       setPadding(dip(16), 0, dip(16), 0)
       gravity = Gravity.CENTER_VERTICAL
-      textColor = 0xFFFFFF.opaque
+      textColor = color.Label_Text
    }
 
    fun _RelativeLayout.CLabel(viewId: Int, textResId: Int) =
@@ -85,7 +86,7 @@ class MainUi : AnkoComponent<Main> {
       gravity = Gravity.CENTER_VERTICAL
       id = viewId
       text = _text
-      backgroundColor = 0x505050.opaque
+      backgroundColor = color.Subtitle_Bg
       setPadding(dip(8), 0, 0, 0)
    }
 
@@ -464,7 +465,7 @@ class MainUi : AnkoComponent<Main> {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Label)
-                    }.textColor = 0x9E9E9E.opaque
+                    }.textColor = Const.color.Label_About_Text
             val s = String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|")
             var i = 1
             CLabel(Const.id.About_Author, String(Base64.decode(s[--i], 0)))
@@ -472,19 +473,19 @@ class MainUi : AnkoComponent<Main> {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Version)
-                    }.textColor = 0x9E9E9E.opaque
+                    }.textColor = Const.color.Label_About_Text
             CLabel(Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Author)
-                    }.textColor = 0x9E9E9E.opaque
+                    }.textColor = Const.color.Label_About_Text
             CLabel(Const.id.About_Github, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Email)
-                    }.textColor = 0x9E9E9E.opaque
+                    }.textColor = Const.color.Label_About_Text
 
          }
       }
