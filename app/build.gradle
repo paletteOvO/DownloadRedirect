@@ -37,7 +37,7 @@ android {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 12
+        versionCode 13
         versionName "(｀・ω・´) 1.1.7"
     }
 }
