@@ -1,7 +1,10 @@
 package net.manhong2112.downloadredirect
 
+import android.app.AndroidAppHelper
 import android.content.Context
 import android.content.SharedPreferences
+import de.robv.android.xposed.XSharedPreferences
+import net.manhong2112.downloadredirect.DLApi.DLApi
 import java.util.*
 
 /**
@@ -10,10 +13,19 @@ import java.util.*
  */
 
 class ConfigDAO(ctx: Context, pref: SharedPreferences) {
+   companion object {
+      fun getPref(ctx: Context = AndroidAppHelper.currentApplication()): ConfigDAO {
+         val pref = XSharedPreferences(Const.PACKAGE_NAME, "pref")
+         pref.makeWorldReadable()
+         pref.reload()
+         return ConfigDAO(ctx, pref)
+      }
+   }
+
    private val Pref = pref
    val ExistingDownloader = Const.ApiList
-           .filter { it.getMethod("isExist", Context::class.java).invoke(it.newInstance(), ctx) as Boolean }
-           .map { it.getMethod("getName").invoke(it.newInstance()) as String }
+           .filter { (it.newInstance() as DLApi).isExist(ctx) }
+           .map { (it.newInstance() as DLApi).getName() }
       get() = field
 
    val LinkFilter: HashSet<String> =

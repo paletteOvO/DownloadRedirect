@@ -38,8 +38,10 @@ class Main : Activity() {
    }
 
    companion object {
-      fun log(DEBUG: Boolean, str: String) {
-         if (DEBUG) Log.d("Xposed", "DownloadRedirect -> $str")
+      fun log(str: String, DEBUG: Boolean = true) {
+         if (DEBUG) {
+            Log.i("Xposed", "DownloadRedirect -> $str")
+         }
       }
 
       fun isPackageInstalled(packageName: String, packageManager: PackageManager): Boolean {
@@ -109,7 +111,7 @@ class MainUi : AnkoComponent<Main> {
       val ColumnHeight = dip(48)
       val SubTitleHeight = dip(36)
 
-      if (Pref.ExistingDownloader.size == 0) {
+      if (Pref.ExistingDownloader.isEmpty()) {
          toast(R.string.toast_no_supported_downloader)
       }
 
@@ -265,7 +267,7 @@ class MainUi : AnkoComponent<Main> {
                               }
                               positiveButton(R.string.button_confirm) {
                                  toast(ctx.getString(R.string.toast_removed, x))
-                                 Main.log(Pref.Debug, "Removed \"$x\" from filter")
+                                 Main.log("Removed \"$x\" from filter", Pref.Debug)
                                  Pref.LinkFilter.remove(x)
                                  Pref.updateLinkFilter()
                               }
@@ -304,13 +306,13 @@ class MainUi : AnkoComponent<Main> {
                         positiveButton(R.string.button_confirm) {
                            val d = link.text.trim().toString()
                            when (true) {
-                              d.length == 0 ->
+                              d.isEmpty() ->
                                  toast(R.string.toast_empty_input)
                               Pref.LinkFilter.contains(d) ->
                                  toast(R.string.toast_rule_already_exist)
                               else -> {
                                  toast(ctx.getString(R.string.toast_added, d))
-                                 Main.log(Pref.Debug, "Added \"$d\" to filter")
+                                 Main.log("Added \"$d\" to filter", Pref.Debug)
                                  Pref.LinkFilter.add(d)
                                  Pref.updateLinkFilter()
                               }
@@ -355,8 +357,7 @@ class MainUi : AnkoComponent<Main> {
                               }
                               positiveButton(R.string.button_confirm) {
                                  toast(ctx.getString(R.string.toast_removed, app[0]))
-                                 Main.log(Pref.Debug,
-                                         "Removed \"${app[0]} | ${app[1]}\" from filter")
+                                 Main.log("Removed \"${app[0]} | ${app[1]}\" from filter", Pref.Debug)
                                  Pref.AppFilter.remove(app[1])
                                  Pref.updateAppFilter()
                               }
@@ -413,7 +414,7 @@ class MainUi : AnkoComponent<Main> {
                                  Pref.AppFilter.contains(item[1]) ->
                                     toast(R.string.toast_rule_already_exist)
                                  else -> {
-                                    Main.log(Pref.Debug, "Added \"${item[0]} | ${item[1]}\" to filter")
+                                    Main.log("Added \"${item[0]} | ${item[1]}\" to filter", Pref.Debug)
                                     toast(ctx.getString(R.string.toast_added, item[0]))
                                     Pref.AppFilter.add(item[1])
                                     Pref.updateAppFilter()
@@ -425,7 +426,7 @@ class MainUi : AnkoComponent<Main> {
                            val s = editText {
                               hint = ctx.getString(R.string.label_search)
                               singleLine = true
-                           }.lparams() {
+                           }.lparams {
                               alignParentLeft()
                               width = matchParent
                            }
