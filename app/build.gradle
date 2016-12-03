@@ -14,10 +14,12 @@ android {
     }
     signingConfigs {
         config {
-            keyAlias 'ml'
-            keyPassword 'f60af4554674a815'
-            storeFile file('C:\\manhong\\WorkSpace\\Android\\ML.ks')
-            storePassword 'f60af4554674a815'
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            keyAlias properties.getProperty('keyAlias')
+            keyPassword properties.getProperty('keyPassword')
+            storeFile file(properties.getProperty('storeFile'))
+            storePassword properties.getProperty('storePassword')
         }
     }
     buildTypes {
