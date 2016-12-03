@@ -9,9 +9,6 @@ android {
         disable 'MissingTranslation'
         abortOnError false
     }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
     signingConfigs {
         config {
             Properties properties = new Properties()
