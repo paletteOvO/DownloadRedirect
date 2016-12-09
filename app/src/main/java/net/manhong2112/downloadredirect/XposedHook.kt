@@ -2,6 +2,7 @@ package net.manhong2112.downloadredirect
 
 import android.app.AndroidAppHelper
 import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
@@ -64,7 +65,7 @@ class XposedHook : IXposedHookZygoteInit {
 
    private val enqueueHook = object : XC_MethodHook() {
       @Throws(Throwable::class)
-      override fun afterHookedMethod(param: MethodHookParam) {
+      override fun beforeHookedMethod(param: MethodHookParam) {
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = ConfigDAO.getPref(ctx)
          log("received download request", Pref.Debug)
@@ -120,32 +121,30 @@ class XposedHook : IXposedHookZygoteInit {
             }
          }
 
-         log("Redirecting Url -> $mUri", Pref.Debug)
-
-         val existedApi = Const.ApiList.filterTo(LinkedList<Class<*>>()) {
+         log("Url to be redirected -> $mUri", Pref.Debug)
+         val existingApi = Const.ApiList.filterTo(LinkedList<Class<*>>()) {
             (it.newInstance() as DLApi).isExist(ctx)
          }
 
-         if (existedApi.isEmpty()) {
+         if (existingApi.isEmpty()) {
             log("doesn't exist any downloader, aborted", Pref.Debug)
             return
          }
 
          val choseAPI = Pref.Downloader
          val v:Boolean
-         if (!Pref.ExistingDownloader.contains(choseAPI)) {
-            v = (existedApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
-            Pref.Downloader = Pref.ExistingDownloader[0]
+         if (Pref.ExistingDownloader.contains(choseAPI)) {
+            v = (existingApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri)
          } else {
-            v = (existedApi[Pref.ExistingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri)
+            v = (existingApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
+            val i = Intent(Const.ACTION_RESET_DOWNLOADER)
+            ctx.sendBroadcast(i)
          }
+
          log("Redirection: ${if (v) "Success" else "Failed"}", Pref.Debug)
-         if(!v) {
-            return
+         if (v) {
+            param.result = 0
          }
-         log("removing original download", Pref.Debug)
-         (param.thisObject as DownloadManager).remove(param.result as Long)
-         param.result = -1
       }
    }
 
@@ -154,10 +153,11 @@ class XposedHook : IXposedHookZygoteInit {
       @Throws(Throwable::class)
       override
       fun afterHookedMethod(param: MethodHookParam) {
-         val Pref = ConfigDAO.getPref()
+         val ctx: Context? = AndroidAppHelper.currentApplication()
+         val DEBUG: Boolean = if (ctx != null) ConfigDAO.getPref(ctx).Debug else true
          if(param.result == null) {
-            log("param.result is null", Pref.Debug)
-            log("${param.args[0]}", Pref.Debug)
+            log("param.result is null", DEBUG)
+            log("${param.args[0]}", DEBUG)
             return
          }
          val packageName = getObjectField(param.result, "packageName")
@@ -169,13 +169,13 @@ class XposedHook : IXposedHookZygoteInit {
          val activities = getObjectField(param.result, "activities") as ArrayList<*>
          if (activities.isEmpty()) return
          // List of Activity
-         log("searching com.dv.adm{|.pay}.AEditor at ${param.args[0]}", Pref.Debug)
+         log("searching com.dv.adm{|.pay}.AEditor at ${param.args[0]}", DEBUG)
          for (activity in activities) {
             // obj.activity
             val info = getObjectField(activity, "info") as ActivityInfo
             when (info.name) {
                "com.dv.adm.pay.AEditor", "com.dv.adm.AEditor" -> {
-                  log("Injecting Redirect Intent", Pref.Debug)
+                  log("Injecting Redirect Intent", DEBUG)
                   val intent = newInstance(ActivityIntentInfo, activity) as IntentFilter
                   intent.addDataScheme("http")
                   intent.addDataScheme("https")
@@ -183,7 +183,7 @@ class XposedHook : IXposedHookZygoteInit {
                   intent.addCategory(Intent.CATEGORY_DEFAULT)
 
                   callMethod(getObjectField(activity, "intents"), "add", intent)
-                  log("Injected Redirect Intent", Pref.Debug)
+                  log("Injected Redirect Intent", DEBUG)
                   return
                }
             }

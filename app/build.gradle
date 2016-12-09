@@ -26,16 +26,13 @@ android {
             signingConfig signingConfigs.config
             // zipAlignEnabled true
         }
-        debug {
-            signingConfig signingConfigs.config
-        }
     }
     defaultConfig {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 13
-        versionName "(｀・ω・´) 1.1.7"
+        versionCode 14
+        versionName "(｀・ω・´) v1.1.8"
     }
 }
 

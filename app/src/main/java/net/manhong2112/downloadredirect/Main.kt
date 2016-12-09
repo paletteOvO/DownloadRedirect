@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +16,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.widget.ArrayAdapter
 import android.widget.Switch
-import net.manhong2112.downloadredirect.Const.color
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
@@ -30,7 +30,12 @@ import java.util.regex.Pattern
 class Main : Activity() {
    override fun onCreate(bundle: Bundle?) {
       super.onCreate(bundle)
-      MainUi().setContentView(this)
+      if (intent.action == Const.ACTION_RESET_DOWNLOADER) {
+         val Pref = ConfigDAO(ctx, ctx.getSharedPreferences("pref", 1))
+         Pref.Downloader = Pref.ExistingDownloader[0]
+      } else {
+         MainUi().setContentView(this)
+      }
    }
 
    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -70,30 +75,39 @@ class Main : Activity() {
 }
 
 class MainUi : AnkoComponent<Main> {
-   fun _RelativeLayout.CLabel(viewId: Int, _text: String) = textView {
+   fun getColor(ctx: Context, id: Int): Int {
+      if (Build.VERSION.SDK_INT >= 23) {
+         return ctx.getColor(id)
+      } else {
+         return ctx.resources.getColor(id)
+      }
+   }
+
+   fun _RelativeLayout.CLabel(ctx: Context, viewId: Int, _text: String) = textView {
       id = viewId
       text = _text
       setPadding(dip(16), 0, dip(16), 0)
       gravity = Gravity.CENTER_VERTICAL
-      textColor = color.Label_Text
+      textColor = getColor(ctx, R.color.label_text)
    }
 
-   fun _RelativeLayout.CLabel(viewId: Int, textResId: Int) =
-           CLabel(viewId, resources.getString(textResId))
+   fun _RelativeLayout.CLabel(ctx: Context, viewId: Int, textResId: Int) =
+           CLabel(ctx, viewId, resources.getString(textResId))
 
-   fun _RelativeLayout.CSubTitle(viewId: Int, _text: String) = textView {
-      if (android.os.Build.VERSION.SDK_INT >= 21) {
+   fun _RelativeLayout.CSubTitle(ctx: Context, viewId: Int, _text: String) = textView {
+      if (Build.VERSION.SDK_INT >= 21) {
          elevation = dip(2).toFloat()
       }
       gravity = Gravity.CENTER_VERTICAL
       id = viewId
       text = _text
-      backgroundColor = color.Subtitle_Bg
-      setPadding(dip(8), 0, 0, 0)
+      textColor = getColor(ctx, R.color.subtitle_text)
+      backgroundColor = getColor(ctx, R.color.subtitle_bg)
+      setPadding(dip(12), 0, 0, 0)
    }
 
-   fun _RelativeLayout.CSubTitle(viewId: Int, textResId: Int) =
-           CSubTitle(viewId, resources.getString(textResId))
+   fun _RelativeLayout.CSubTitle(ctx: Context, viewId: Int, textResId: Int) =
+           CSubTitle(ctx, viewId, resources.getString(textResId))
 
    fun _RelativeLayout.CSwitch(viewId: Int, _text: String, onClickF: (Switch) -> Unit) = switch {
       id = viewId
@@ -122,7 +136,7 @@ class MainUi : AnkoComponent<Main> {
             }
             id = Const.id.Pref_Page
             // Debug
-            CSubTitle(Const.id.Debug_Label, R.string.label_debug)
+            CSubTitle(ctx, Const.id.Debug_Label, R.string.label_debug)
                     .lparams {
                        width = matchParent
                        height = SubTitleHeight
@@ -138,7 +152,7 @@ class MainUi : AnkoComponent<Main> {
             }.isChecked = Pref.Debug
 
             // Pref
-            CSubTitle(Const.id.Pref_Label, R.string.label_preferences).lparams {
+            CSubTitle(ctx, Const.id.Pref_Label, R.string.label_preferences).lparams {
                below(Const.id.Debug_Logging_Switch)
                width = matchParent
                height = SubTitleHeight
@@ -174,11 +188,11 @@ class MainUi : AnkoComponent<Main> {
                                (it.newInstance() as DLApi).isExist(ctx)
                             }
                             .map {
-                               (it.newInstance() as DLApi).getName()
+                               (it.newInstance() as DLApi).APP_NAME
                             }
 
             if (existedApiName.size > 1) {
-               val b = CLabel(Const.id.Pref_Using_Downloader, Pref.Downloader)
+               val b = CLabel(ctx, Const.id.Pref_Using_Downloader, Pref.Downloader)
                        .lparams {
                           rightMargin = dip(16)
                           height = ColumnHeight
@@ -194,7 +208,7 @@ class MainUi : AnkoComponent<Main> {
                   }
                }
 
-               val l = CLabel(Const.id.Pref_Downloader_Selector, R.string.list_change_downloader)
+               val l = CLabel(ctx, Const.id.Pref_Downloader_Selector, R.string.list_change_downloader)
                        .lparams {
                           width = matchParent
                           height = ColumnHeight
@@ -212,7 +226,7 @@ class MainUi : AnkoComponent<Main> {
             }
 
             // Filter
-            CSubTitle(Const.id.Filter_Label, R.string.label_filter).lparams {
+            CSubTitle(ctx, Const.id.Filter_Label, R.string.label_filter).lparams {
                width = matchParent
                height = SubTitleHeight
                if (existedApiName.size > 1) {
@@ -222,7 +236,7 @@ class MainUi : AnkoComponent<Main> {
                }
             }
 
-            val b = CLabel(Const.id.Pref_Use_White_List, R.string.switch_white_list)
+            val b = CLabel(ctx, Const.id.Pref_Use_White_List, R.string.switch_white_list)
                     .lparams {
                        width = matchParent
                        height = ColumnHeight
@@ -245,7 +259,7 @@ class MainUi : AnkoComponent<Main> {
                                }).setPositiveButton(R.string.button_confirm, null).create().show()
             }
 
-            val a = CLabel(Const.id.Link_Filter, R.string.filter_link)
+            val a = CLabel(ctx, Const.id.Link_Filter, R.string.filter_link)
                     .lparams {
                        width = matchParent
                        height = ColumnHeight
@@ -281,7 +295,7 @@ class MainUi : AnkoComponent<Main> {
                }
             }
 
-            val x = CLabel(Const.id.Link_Filter_Add, "+")
+            val x = CLabel(ctx, Const.id.Link_Filter_Add, "+")
                     .lparams {
                        width = dip(36)
                        rightMargin = dip(20)
@@ -324,7 +338,7 @@ class MainUi : AnkoComponent<Main> {
                }.show()
             }
 
-            val y = CLabel(Const.id.App_Filter, R.string.filter_app)
+            val y = CLabel(ctx, Const.id.App_Filter, R.string.filter_app)
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
@@ -372,7 +386,7 @@ class MainUi : AnkoComponent<Main> {
                }
             }
 
-            val z = CLabel(Const.id.App_Filter_Add, "+")
+            val z = CLabel(ctx, Const.id.App_Filter_Add, "+")
                     .lparams {
                        width = dip(36)
                        rightMargin = dip(20)
@@ -455,38 +469,38 @@ class MainUi : AnkoComponent<Main> {
 
 
             // About
-            CSubTitle(Const.id.About_Label, R.string.label_about).lparams {
+            CSubTitle(ctx, Const.id.About_Label, R.string.label_about).lparams {
                width = matchParent
                height = SubTitleHeight
                below(Const.id.App_Filter)
             }
 
-            CLabel(Const.id.About_Version, "${ctx.getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}")
+            CLabel(ctx, Const.id.About_Version, "${ctx.getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}")
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Label)
-                    }.textColor = Const.color.Label_About_Text
+                    }.textColor = getColor(ctx, R.color.label_about_text)
             val s = String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|")
             var i = 1
-            CLabel(Const.id.About_Author, String(Base64.decode(s[--i], 0)))
+            CLabel(ctx, Const.id.About_Author, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Version)
-                    }.textColor = Const.color.Label_About_Text
-            CLabel(Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
+                    }.textColor = getColor(ctx, R.color.label_about_text)
+            CLabel(ctx, Const.id.About_Email, String(Base64.decode(s[(i++).plus(++i)], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Author)
-                    }.textColor = Const.color.Label_About_Text
-            CLabel(Const.id.About_Github, String(Base64.decode(s[--i], 0)))
+                    }.textColor = getColor(ctx, R.color.label_about_text)
+            CLabel(ctx, Const.id.About_Github, String(Base64.decode(s[--i], 0)))
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Email)
-                    }.textColor = Const.color.Label_About_Text
+                    }.textColor = getColor(ctx, R.color.label_about_text)
 
          }
       }

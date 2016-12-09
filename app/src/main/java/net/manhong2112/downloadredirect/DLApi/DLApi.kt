@@ -11,10 +11,6 @@ abstract class DLApi {
    abstract val PACKAGE_NAME: String
    abstract val APP_NAME: String
 
-   open fun getName(): String {
-      return APP_NAME
-   }
-
    open fun getVersion(ctx: Context): Int {
       val packageManager = ctx.packageManager ?: return -1
       val packages = packageManager.getInstalledPackages(0)

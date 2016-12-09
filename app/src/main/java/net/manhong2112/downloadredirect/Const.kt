@@ -2,7 +2,6 @@ package net.manhong2112.downloadredirect
 
 import net.manhong2112.downloadredirect.DLApi.ADMApi
 import net.manhong2112.downloadredirect.DLApi.LoaderDroidApi
-import org.jetbrains.anko.opaque
 
 /**
  * Created by manhong2112 on 11/4/2016.
@@ -10,6 +9,7 @@ import org.jetbrains.anko.opaque
  */
 object Const {
    val ACTION_DOWNLOAD_REDIRECT = "net.manhong2112.intent.DOWNLOAD_REDIRECTION"
+   val ACTION_RESET_DOWNLOADER = "new.manhong2112.intent.RESET_DOWNLOADER"
    val PACKAGE_NAME = "net.manhong2112.downloadredirect"
 
    val ApiList = setOf(ADMApi::class.java, LoaderDroidApi::class.java)
@@ -38,12 +38,5 @@ object Const {
       val About_Email = 20
       val About_Author = 21
       val About_ListView = 22
-   }
-
-   object color {
-      val white = 0xFFFFFF.opaque
-      val Label_About_Text = 0x9E9E9E.opaque
-      val Label_Text = white
-      val Subtitle_Bg = 0x505050.opaque
    }
 }
