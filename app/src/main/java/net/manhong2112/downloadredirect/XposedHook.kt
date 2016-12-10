@@ -138,6 +138,7 @@ class XposedHook : IXposedHookZygoteInit {
          } else {
             v = (existingApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
             val i = Intent(Const.ACTION_RESET_DOWNLOADER)
+            i.addCategory(Intent.CATEGORY_DEFAULT)
             ctx.sendBroadcast(i)
          }
 

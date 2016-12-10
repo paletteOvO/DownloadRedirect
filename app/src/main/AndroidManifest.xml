@@ -18,7 +18,6 @@
             <intent-filter>
                 <action android:name="new.manhong2112.intent.RESET_DOWNLOADER"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
         <activity-alias

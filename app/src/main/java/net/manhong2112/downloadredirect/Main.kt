@@ -73,12 +73,12 @@ class Main : Activity() {
       }
    }
 }
-
 class MainUi : AnkoComponent<Main> {
    fun getColor(ctx: Context, id: Int): Int {
       if (Build.VERSION.SDK_INT >= 23) {
          return ctx.getColor(id)
       } else {
+         @Suppress("deprecation")
          return ctx.resources.getColor(id)
       }
    }
