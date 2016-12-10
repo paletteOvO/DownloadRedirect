@@ -32,7 +32,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 48
-        versionName "(｀・ω・´) v1.1.8"
+        versionName "(๑• . •๑) v1.1.8"
     }
 }
 
