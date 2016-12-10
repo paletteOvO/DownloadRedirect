@@ -11,30 +11,47 @@ import java.util.*
  * config manager
  */
 
-class ConfigDAO(ctx: Context, pref: SharedPreferences) {
+class ConfigDAO(pref: SharedPreferences) {
    companion object {
-      fun getPref(ctx: Context): ConfigDAO {
+      fun getPref(): ConfigDAO {
          val pref = XSharedPreferences(Const.PACKAGE_NAME, "pref")
          pref.makeWorldReadable()
          pref.reload()
-         return ConfigDAO(ctx, pref)
+         return ConfigDAO(pref)
       }
    }
 
    private val Pref = pref
-   val ExistingDownloader = Const.ApiList
-           .filter { (it.newInstance() as DLApi).isExist(ctx) }
-           .map { (it.newInstance() as DLApi).APP_NAME }
-      get() = field
+   private var ExistingDownloader: List<String>? = null
+   fun getExistingDownloader(ctx: Context): List<String> {
+      ExistingDownloader = ExistingDownloader ?:
+              Const.ApiList
+                      .filter { (it.newInstance() as DLApi).isExist(ctx) }
+                      .map { (it.newInstance() as DLApi).APP_NAME }
+      return ExistingDownloader!!
+   }
 
-   val LinkFilter: HashSet<String> =
-           Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
-      get() = field
+   private var LinkFilter: HashSet<String>? = null
+   fun getLinkFilter(ctx: Context): HashSet<String> {
+      LinkFilter = LinkFilter ?:
+              Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
+      return LinkFilter!!
+   }
 
-   val AppFilter: HashSet<String> =
-           Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
-      get() = field
+   private var AppFilter: HashSet<String>? = null
+   fun getAppFilter(ctx: Context): HashSet<String> {
+      AppFilter = AppFilter ?:
+              Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
+      return AppFilter!!
+   }
 
+
+   var Experiment = Pref.getBoolean("Experiment", false)
+      get() = field
+      set(b) {
+         field = b
+         Pref.edit().putBoolean("Experiment", b).apply()
+      }
 
 
    var Debug = Pref.getBoolean("Debug", false)
@@ -51,17 +68,16 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
          Pref.edit().putBoolean("HideIcon", b).apply()
       }
 
-   var Downloader: String = ""
-      get() {
-         if (field == "") {
-            field = Pref.getString("Downloader", null) ?: this.ExistingDownloader.first()
-         }
-         return field
-      }
+   var Downloader: String? = null
       set(s) {
          field = s
          Pref.edit().putString("Downloader", s).apply()
       }
+
+   fun getDownloader(ctx: Context): String {
+      Downloader = Downloader ?: Pref.getString("Downloader", null) ?: getExistingDownloader(ctx).first()
+      return Downloader!!
+   }
 
    var UsingWhiteList_Link = Pref.getBoolean("UsingWhiteList_Link", false)
       get() = field
@@ -85,11 +101,11 @@ class ConfigDAO(ctx: Context, pref: SharedPreferences) {
       }
 
    fun updateLinkFilter() {
-      Pref.edit().putStringSet("LinkFilter", LinkFilter.toSet()).apply()
+      Pref.edit().putStringSet("LinkFilter", LinkFilter!!.toSet()).apply()
    }
 
    fun updateAppFilter() {
-      Pref.edit().putStringSet("AppFilter", AppFilter.toSet()).apply()
+      Pref.edit().putStringSet("AppFilter", AppFilter!!.toSet()).apply()
    }
 
 }

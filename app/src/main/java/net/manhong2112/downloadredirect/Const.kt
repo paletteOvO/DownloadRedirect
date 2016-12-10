@@ -1,5 +1,6 @@
 package net.manhong2112.downloadredirect
 
+import android.os.Build
 import net.manhong2112.downloadredirect.DLApi.ADMApi
 import net.manhong2112.downloadredirect.DLApi.LoaderDroidApi
 
@@ -11,6 +12,9 @@ object Const {
    val ACTION_DOWNLOAD_REDIRECT = "net.manhong2112.intent.DOWNLOAD_REDIRECTION"
    val ACTION_RESET_DOWNLOADER = "new.manhong2112.intent.RESET_DOWNLOADER"
    val PACKAGE_NAME = "net.manhong2112.downloadredirect"
+   // version greater or equal than xxx
+   val VER_GE_LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+   val VER_GE_MARSHMALLOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
 
    val ApiList = setOf(ADMApi::class.java, LoaderDroidApi::class.java)
 
@@ -38,5 +42,6 @@ object Const {
       val About_Email = 20
       val About_Author = 21
       val About_ListView = 22
+      val Debug_Experiment_Switch = 23
    }
 }
