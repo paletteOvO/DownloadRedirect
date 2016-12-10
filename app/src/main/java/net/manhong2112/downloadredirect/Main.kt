@@ -1,12 +1,12 @@
 package net.manhong2112.downloadredirect
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -31,8 +31,8 @@ class Main : Activity() {
    override fun onCreate(bundle: Bundle?) {
       super.onCreate(bundle)
       if (intent.action == Const.ACTION_RESET_DOWNLOADER) {
-         val Pref = ConfigDAO(ctx, ctx.getSharedPreferences("pref", 1))
-         Pref.Downloader = Pref.ExistingDownloader[0]
+         val Pref = ConfigDAO(ctx.getSharedPreferences("pref", 1))
+         Pref.Downloader = Pref.getExistingDownloader(this)[0]
       } else {
          MainUi().setContentView(this)
       }
@@ -74,8 +74,9 @@ class Main : Activity() {
    }
 }
 class MainUi : AnkoComponent<Main> {
+   @TargetApi(23)
    fun getColor(ctx: Context, id: Int): Int {
-      if (Build.VERSION.SDK_INT >= 23) {
+      if (Const.VER_GE_MARSHMALLOW) {
          return ctx.getColor(id)
       } else {
          @Suppress("deprecation")
@@ -95,7 +96,7 @@ class MainUi : AnkoComponent<Main> {
            CLabel(ctx, viewId, resources.getString(textResId))
 
    fun _RelativeLayout.CSubTitle(ctx: Context, viewId: Int, _text: String) = textView {
-      if (Build.VERSION.SDK_INT >= 21) {
+      if (Const.VER_GE_LOLLIPOP) {
          elevation = dip(2).toFloat()
       }
       gravity = Gravity.CENTER_VERTICAL
@@ -120,12 +121,14 @@ class MainUi : AnkoComponent<Main> {
            CSwitch(viewId, resources.getString(textResId), onClickF)
 
    override fun createView(ui: AnkoContext<Main>) = with(ui) {
-      val Pref = ConfigDAO(ctx, ctx.getSharedPreferences("pref", 1))
+      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", 1))
+      val af = Pref.getAppFilter(ctx)
+      val lf = Pref.getLinkFilter(ctx)
 
       val ColumnHeight = dip(48)
       val SubTitleHeight = dip(36)
 
-      if (Pref.ExistingDownloader.isEmpty()) {
+      if (Pref.getExistingDownloader(ctx).isEmpty()) {
          toast(R.string.toast_no_supported_downloader)
       }
 
@@ -150,6 +153,15 @@ class MainUi : AnkoComponent<Main> {
                height = ColumnHeight
                below(Const.id.Debug_Label)
             }.isChecked = Pref.Debug
+
+            CSwitch(Const.id.Debug_Experiment_Switch, R.string.switch_debug_experiment)
+            { view ->
+               Pref.Experiment = view.isChecked
+            }.lparams {
+               width = matchParent
+               height = ColumnHeight
+               below(Const.id.Debug_Experiment_Switch)
+            }.isChecked = Pref.Experiment
 
             // Pref
             CSubTitle(ctx, Const.id.Pref_Label, R.string.label_preferences).lparams {
@@ -192,7 +204,7 @@ class MainUi : AnkoComponent<Main> {
                             }
 
             if (existedApiName.size > 1) {
-               val b = CLabel(ctx, Const.id.Pref_Using_Downloader, Pref.Downloader)
+               val b = CLabel(ctx, Const.id.Pref_Using_Downloader, Pref.getDownloader(ctx))
                        .lparams {
                           rightMargin = dip(16)
                           height = ColumnHeight
@@ -267,22 +279,22 @@ class MainUi : AnkoComponent<Main> {
                        below(Const.id.Pref_Use_White_List)
                     }
             a.onClick {
-               if (!Pref.LinkFilter.isEmpty()) {
-                  val lf = Pref.LinkFilter.sorted()
-                  selector(ctx.getString(R.string.list_filter_link), lf) {
+               if (!lf.isEmpty()) {
+                  val sortedLF = lf.sorted()
+                  selector(ctx.getString(R.string.list_filter_link), sortedLF) {
                      i: Int ->
                      alert {
                         customView {
                            verticalLayout {
                               padding = dip(24)
-                              val x = lf[i]
+                              val x = sortedLF[i]
                               textView {
                                  text = ctx.getString(R.string.dialog_remove_confirm, x)
                               }
                               positiveButton(R.string.button_confirm) {
                                  toast(ctx.getString(R.string.toast_removed, x))
                                  Main.log("Removed \"$x\" from filter", Pref.Debug)
-                                 Pref.LinkFilter.remove(x)
+                                 lf.remove(x)
                                  Pref.updateLinkFilter()
                               }
                               negativeButton(R.string.button_cancel) {}
@@ -319,15 +331,16 @@ class MainUi : AnkoComponent<Main> {
                         }
                         positiveButton(R.string.button_confirm) {
                            val d = link.text.trim().toString()
+                           val _lf = Pref.getLinkFilter(ctx)
                            when (true) {
                               d.isEmpty() ->
                                  toast(R.string.toast_empty_input)
-                              Pref.LinkFilter.contains(d) ->
+                              _lf.contains(d) ->
                                  toast(R.string.toast_rule_already_exist)
                               else -> {
                                  toast(ctx.getString(R.string.toast_added, d))
                                  Main.log("Added \"$d\" to filter", Pref.Debug)
-                                 Pref.LinkFilter.add(d)
+                                 _lf.add(d)
                                  Pref.updateLinkFilter()
                               }
                            }
@@ -346,11 +359,11 @@ class MainUi : AnkoComponent<Main> {
                        below(Const.id.Link_Filter)
                     }
             y.onClick {
-               if (!Pref.AppFilter.isEmpty()) {
+               if (!af.isEmpty()) {
                   val appNameList = arrayListOf<String>()
-                  Pref.AppFilter.forEach {
+                  af.forEach {
                      if(!Main.isPackageInstalled(it, ctx.packageManager)) {
-                        Pref.AppFilter.remove(it)
+                        af.remove(it)
                      } else {
                         val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
                         appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " +
@@ -372,7 +385,7 @@ class MainUi : AnkoComponent<Main> {
                               positiveButton(R.string.button_confirm) {
                                  toast(ctx.getString(R.string.toast_removed, app[0]))
                                  Main.log("Removed \"${app[0]} | ${app[1]}\" from filter", Pref.Debug)
-                                 Pref.AppFilter.remove(app[1])
+                                 af.remove(app[1])
                                  Pref.updateAppFilter()
                               }
                               negativeButton(R.string.button_cancel) {}
@@ -404,7 +417,7 @@ class MainUi : AnkoComponent<Main> {
                      (Pref.IgnoreSystemApp &&
                              ((l.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) ->
                         continue@loop
-                     (Pref.AppFilter.contains(l.packageName)) ->
+                     (af.contains(l.packageName)) ->
                         continue@loop
                   }
                   appNameList.add(
@@ -425,12 +438,12 @@ class MainUi : AnkoComponent<Main> {
                               i: Int ->
                               val item = aa.getItem(i).split("\n ")
                               when (true) {
-                                 Pref.AppFilter.contains(item[1]) ->
+                                 af.contains(item[1]) ->
                                     toast(R.string.toast_rule_already_exist)
                                  else -> {
                                     Main.log("Added \"${item[0]} | ${item[1]}\" to filter", Pref.Debug)
                                     toast(ctx.getString(R.string.toast_added, item[0]))
-                                    Pref.AppFilter.add(item[1])
+                                    af.add(item[1])
                                     Pref.updateAppFilter()
                                  }
                               }
