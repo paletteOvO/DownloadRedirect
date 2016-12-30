@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import de.robv.android.xposed.XSharedPreferences
 import net.manhong2112.downloadredirect.DLApi.DLApi
-import java.util.*
 
 /**
  * Created by manhong2112 on 18/7/2016.
@@ -31,20 +30,13 @@ class ConfigDAO(pref: SharedPreferences) {
       return ExistingDownloader!!
    }
 
-   private var LinkFilter: HashSet<String>? = null
-   fun getLinkFilter(ctx: Context): HashSet<String> {
-      LinkFilter = LinkFilter ?:
-              Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
-      return LinkFilter!!
+   val LinkFilter by lazy {
+      Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
    }
 
-   private var AppFilter: HashSet<String>? = null
-   fun getAppFilter(ctx: Context): HashSet<String> {
-      AppFilter = AppFilter ?:
-              Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
-      return AppFilter!!
+   val AppFilter by lazy {
+      Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
    }
-
 
    var Experiment = Pref.getBoolean("Experiment", false)
       get() = field
@@ -100,12 +92,19 @@ class ConfigDAO(pref: SharedPreferences) {
          Pref.edit().putBoolean("IgnoreSystemApp", b).apply()
       }
 
+   var FirstRun = Pref.getBoolean("FirstRun", true)
+      get() = field
+      set(b) {
+         field = b
+         Pref.edit().putBoolean("FirstRun", b).apply()
+      }
+
    fun updateLinkFilter() {
-      Pref.edit().putStringSet("LinkFilter", LinkFilter!!.toSet()).apply()
+      Pref.edit().putStringSet("LinkFilter", LinkFilter.toSet()).apply()
    }
 
    fun updateAppFilter() {
-      Pref.edit().putStringSet("AppFilter", AppFilter!!.toSet()).apply()
+      Pref.edit().putStringSet("AppFilter", AppFilter.toSet()).apply()
    }
 
 }
