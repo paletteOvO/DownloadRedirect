@@ -77,8 +77,8 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = ConfigDAO.getPref()
          val existingDownloader = Pref.getExistingDownloader(ctx)
-         val appFilter = Pref.getAppFilter(ctx)
-         val linkFilter = Pref.getLinkFilter(ctx)
+         val appFilter = Pref.AppFilter
+         val linkFilter = Pref.LinkFilter
          log("received download request", Pref.Debug)
          val mUri = getObjectField(param.args[0], "mUri") as Uri
          when(true) {
