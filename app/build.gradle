@@ -31,13 +31,13 @@ android {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 54
-        versionName "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄  v1.2.0.final"
+        versionCode 58
+        versionName "1.2.0.fina|･ω･｀)"
     }
 }
 
 buildscript {
-    ext.kotlin_version = '1.0.5-2'
+    ext.kotlin_version = '1.0.6'
     ext.anko_version = '0.9'
 
     repositories {

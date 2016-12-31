@@ -31,11 +31,11 @@ class ConfigDAO(pref: SharedPreferences) {
    }
 
    val LinkFilter by lazy {
-      Pref.getStringSet("LinkFilter", setOf<String>()).toHashSet()
+      Pref.getStringSet("LinkFilter", setOf<String>()).toSortedSet()
    }
 
    val AppFilter by lazy {
-      Pref.getStringSet("AppFilter", setOf<String>()).toHashSet()
+      Pref.getStringSet("AppFilter", setOf<String>()).toSortedSet()
    }
 
    var Experiment = Pref.getBoolean("Experiment", false)

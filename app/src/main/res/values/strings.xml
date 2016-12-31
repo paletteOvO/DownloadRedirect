@@ -36,13 +36,40 @@
 
     <string name="button_add">Add</string>
     <string name="button_confirm">Confirm</string>
+    <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
 
     <string name="label_regex">Regular Expression</string>
     <string name="label_about">About</string>
     <string name="label_search">Search</string>
 
+    <string name="first_run">First Run</string>
+    <string name="first_run_message">It is the first time you use this application, which is use for redirect the download of system download manager to ADM or LoaderDroid. Long click the option to get help/explain.</string>
 
+    <string name="debug_logging_help">"Generally won't be used, to enable the logging of application for debug uses"</string>
+    <string name="debug_experiment_help">
+        Enable experiment function and maybe solve the problem that failed to redirect to adm.
+    </string>
+
+    <string name="pref_hide_icon_help">
+        Self-explained, to hide icon from launcher
+    </string>
+    <string name="pref_hide_ignore_system_app_help">
+        "Hide all system app from app filter list, also their download won't be redirected"
+    </string>
+    <string name="pref_using_downloader_help">
+        You installed more than one supported downloader, so you can choose to use any of them to download here.
+    </string>
+
+    <string name="filter_whitelist_help">
+        "Enable to apply whitelist rule for link or app filter. Default is blacklist.\nBlacklist: \n  redirect all download except link or app match the rule\nWhitelist: \n  redirect all download iff link and app match the rule"
+    </string>
+    <string name="filter_link_help">
+        "Apply with regex rule. If you don't know how to use, Google it! or add your link between two .*. \nFor example: .*www.google.com.*"
+    </string>
+    <string name="filter_app_help">
+        "Em....just select what app you want to redirect or not to.."
+    </string>
 
     <string name="Info" translatable="false">UVhWMGFHOXlPaUJ0WVc1b2IyNW5NakV4TWc9PXxSMmwwYUhWaU9pQm9kSFJ3Y3pvdkwyZHBkR2gxWWk1amIyMHZiV0Z1YUc5dVp6SXhNVEk9fFJXMWhhV3c2SUcxaGJtaHZibWN5TVRFeVFHZHRZV2xzTG1OdmJRPT0=</string>
 </resources>

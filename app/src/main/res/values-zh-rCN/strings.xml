@@ -6,7 +6,8 @@
 
         <string name="label_preferences">设置</string>
         <string name="switch_hide_app_icon">隐藏图标</string>
-        <string name="switch_white_list">开启白名单</string>
+        
+    <string name="switch_white_list">仅跳转</string>
         <string name="switch_ignore_system_app">忽略系统应用</string>
         <string name="list_change_downloader">下载器</string>
         <string name="selector_downloader">选择下载器</string>
@@ -35,8 +36,38 @@
         <string name="button_cancel">取消</string>
         <string name="label_regex">正规表示式</string>
     <string name="label_about">关于</string>
-    <string name="selector_whitelist">开启白名单</string>
+    <string name="selector_whitelist">仅跳转</string>
     <string name="label_search">搜索</string>
     <string name="list_filter_link">链接</string>
     <string name="list_filter_app">应用</string>
+
+    <string name="first_run">首次運行</string>
+    <string name="first_run_message">
+        这是你第一次打开这个应用程序，这个应用程序是用来重定向系统下载管理器的下载到ADM或LoaderDroid。长按选项可以获得帮助/解释。
+    </string>
+
+    <string name="debug_logging_help">"基本上用不到，可以启用日志记录並進行调试的"</string>
+    <string name="debug_experiment_help">
+        启用实验功能，或許能解决ADM重定向失敗的问题。
+    </string>
+
+    <string name="pref_hide_icon_help">
+        一如其名，隐藏桌面图标
+    </string>
+    <string name="pref_hide_ignore_system_app_help">
+        应用列表中隐藏所有系统应用，也不会重定向它们的下载
+    </string>
+    <string name="pref_using_downloader_help">
+        您安装了多个受支持的下载程序，因此您可以选择使用其中的任何一个下载。
+    </string>
+
+    <string name="filter_whitelist_help">
+        对链接或应用过滤器应用白名单规则。 默认为黑名单。\n黑名单：\n  重定向除了符合链接或应用程序的规则外所有的下载\n白名单：\n  重定向符合链接及应用程序规则所有下载
+    </string>
+    <string name="filter_link_help">
+        使用正则表达式，如果您不知道如何使用的話，請自行Google，或者在两个.*之间加上链接。\n比如：.* www.google.com.*
+    </string>
+    <string name="filter_app_help">
+        嗯....就是选择你想要重定向或不重定向的应用程序...
+    </string>
 </resources>
