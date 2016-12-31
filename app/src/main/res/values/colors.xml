@@ -7,4 +7,5 @@
     <color name="subtitle_bg">#555</color>
     <color name="label_text">#FFF</color>
     <color name="label_about_text">#9E9E9E</color>
+    <color name="checked_checkbox">#80cbc4</color>
 </resources>

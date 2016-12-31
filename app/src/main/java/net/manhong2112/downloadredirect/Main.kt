@@ -1,7 +1,6 @@
 package net.manhong2112.downloadredirect
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -13,12 +12,14 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
+import android.view.WindowManager
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Switch
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import org.jetbrains.anko.*
 import java.util.*
-import java.util.regex.Pattern
+
 
 /**
  * Created by manhong2112 on 10/4/2016.
@@ -130,8 +131,8 @@ class MainUi : AnkoComponent<Main> {
       }
       if (Pref.FirstRun) {
          Pref.FirstRun = false
-         alert("msg", "FirstRun") {
-
+         alert(R.string.first_run_message, R.string.first_run) {
+            positiveButton(R.string.button_ok) {}
          }.show()
       }
 
@@ -158,6 +159,12 @@ class MainUi : AnkoComponent<Main> {
                onClick {
                   Pref.Debug = (it as Switch).isChecked
                }
+               onLongClick {
+                  alert(R.string.debug_logging_help, R.string.switch_debug_logging) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
+               }
             }
 
             with(CSwitch(Const.id.Debug_Experiment_Switch, R.string.switch_debug_experiment)) {
@@ -169,6 +176,12 @@ class MainUi : AnkoComponent<Main> {
                }
                onClick {
                   Pref.Experiment = (it as Switch).isChecked
+               }
+               onLongClick {
+                  alert(R.string.debug_experiment_help, R.string.switch_debug_experiment) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
                }
             }
 
@@ -190,6 +203,12 @@ class MainUi : AnkoComponent<Main> {
                      Main.displayIcon(ctx)
                   }
                }
+               onLongClick {
+                  alert(R.string.pref_hide_icon_help, R.string.switch_hide_app_icon) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
+               }
                lparams {
                   below(Const.id.Pref_Label)
                   width = matchParent
@@ -204,8 +223,13 @@ class MainUi : AnkoComponent<Main> {
                onClick {
                   Pref.IgnoreSystemApp = (it as Switch).isChecked
                }
+               onLongClick {
+                  alert(R.string.pref_hide_ignore_system_app_help, R.string.switch_ignore_system_app) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
+               }
                lparams {
-
                   width = matchParent
                   height = ColumnHeight
                   below(Const.id.Pref_HideIcon_Switch)
@@ -256,6 +280,12 @@ class MainUi : AnkoComponent<Main> {
                         b.text = existedApiName[i]
                      }
                   }
+                  onLongClick {
+                     alert(R.string.pref_using_downloader_help, R.string.selector_downloader) {
+                        positiveButton(R.string.button_ok) {}
+                     }.show()
+                     true
+                  }
                }
             }
 
@@ -277,21 +307,42 @@ class MainUi : AnkoComponent<Main> {
                   below(Const.id.Filter_Label)
                }
                onClick {
-                  AlertDialog.Builder(ctx)
-                          .setTitle(R.string.selector_whitelist)
-                          .setMultiChoiceItems(
-                                  arrayOf(ctx.getString(R.string.filter_link),
-                                          ctx.getString(R.string.filter_app)),
-                                  booleanArrayOf(Pref.UsingWhiteList_Link,
-                                          Pref.UsingWhiteList_App),
-                                  { dialog, which, isChecked ->
-                                     when (which) {
-                                        0 -> Pref.UsingWhiteList_Link = isChecked
-                                        1 -> Pref.UsingWhiteList_App = isChecked
-                                     }
-                                  })
-                          .setPositiveButton(R.string.button_confirm, null)
-                          .create().show()
+                  alert {
+                     customView {
+                        verticalLayout {
+                           title(R.string.selector_whitelist)
+                           val choiceList = arrayListOf(
+                                   ctx.getString(R.string.filter_link),
+                                   ctx.getString(R.string.filter_app))
+                           val aa = CheckableListAdapter(choiceList, ctx) {
+                              adapter, view, pos, isChecked ->
+                              when (pos) {
+                                 0 -> Pref.UsingWhiteList_Link = isChecked
+                                 1 -> Pref.UsingWhiteList_App = isChecked
+                              }
+                           }
+                           aa.isSelected[0] = Pref.UsingWhiteList_Link
+                           aa.isSelected[1] = Pref.UsingWhiteList_App
+                           listView {
+                              divider = null
+                              isVerticalScrollBarEnabled = false
+                              lparams {
+                                 padding = dip(4)
+                                 height = 0
+                                 weight = 1f
+                                 width = matchParent
+                              }
+                              adapter = aa
+                           }
+                        }
+                     }
+                  }.show()
+               }
+               onLongClick {
+                  alert(R.string.filter_whitelist_help, R.string.switch_white_list) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
                }
             }
 
@@ -303,205 +354,187 @@ class MainUi : AnkoComponent<Main> {
                   below(Const.id.Pref_Use_White_List)
                }
                onClick {
-                  if (lf.isNotEmpty()) {
-                     val sortedLF = lf.sorted()
-                     selector(ctx.getString(R.string.list_filter_link), sortedLF) {
-                        i: Int ->
-                        alert {
-                           customView {
-                              verticalLayout {
-                                 padding = dip(24)
-                                 val x = sortedLF[i]
-                                 textView {
-                                    text = ctx.getString(R.string.dialog_remove_confirm, x)
-                                 }
-                                 positiveButton(R.string.button_confirm) {
-                                    toast(ctx.getString(R.string.toast_removed, x))
-                                    Main.log("Removed \"$x\" from filter", Pref.Debug)
-                                    lf.remove(x)
-                                    Pref.updateLinkFilter()
-                                 }
-                                 negativeButton(R.string.button_cancel) {}
-                              }
-                           }
-                        }.show()
-                     }
-                  } else {
-                     toast(R.string.toast_empty_filter)
-                  }
-               }
-            }
-
-            with(CLabel(ctx, Const.id.Link_Filter_Add, "+")) {
-               lparams {
-                  width = dip(36)
-                  rightMargin = dip(20)
-                  height = ColumnHeight
-                  alignParentRight()
-                  below(Const.id.Pref_Use_White_List)
-               }
-               padding = 0
-               gravity = Gravity.CENTER
-               textSize = sp(10).toFloat()
-               onClick {
                   alert {
                      customView {
                         verticalLayout {
-                           padding = dip(24)
-                           textView {
-                              textResource = R.string.filter_link
+                           lparams {
+                              height = matchParent
+                              verticalPadding = dip(16)
                            }
-                           val link = editText {
-                              hint = ctx.getString(R.string.label_regex)
+                           val x = ArrayList<String>(lf)
+                           val aa = ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, x)
+                           title(R.string.list_filter_link)
+                           listView {
+                              divider = null
+                              isVerticalScrollBarEnabled = false
+                              lparams {
+                                 height = 0
+                                 weight = 1f
+                                 width = matchParent
+                              }
+                              adapter = aa
+                              onItemClickListener =
+                                      AdapterView.OnItemClickListener {
+                                         parent, view, position, id ->
+                                         alert("Are you sure to blabla..") {
+                                            positiveButton(R.string.button_confirm) {
+                                               val item = aa.getItem(position)
+                                               toast(ctx.getString(R.string.toast_removed, item[0]))
+                                               lf.remove(item)
+                                               Pref.updateLinkFilter()
+                                               x.remove(item)
+                                               aa.notifyDataSetChanged()
+                                            }
+                                            negativeButton(R.string.button_cancel)
+                                         }.show()
+                                      }
                            }
-                           positiveButton(R.string.button_confirm) {
-                              val d = link.text.trim().toString()
-                              when (true) {
-                                 d.isEmpty() ->
-                                    toast(R.string.toast_empty_input)
-                                 lf.contains(d) ->
-                                    toast(R.string.toast_rule_already_exist)
-                                 else -> {
-                                    toast(ctx.getString(R.string.toast_added, d))
-                                    Main.log("Added \"$d\" to filter", Pref.Debug)
-                                    lf.add(d)
-                                    Pref.updateLinkFilter()
+                           linearLayout {
+                              lparams {
+                                 width = matchParent
+                                 horizontalMargin = dip(4)
+                                 gravity = Gravity.CENTER
+                              }
+                              val link = editText {
+                                 maxLines = 1
+                                 inputType = android.text.InputType.TYPE_CLASS_TEXT
+                                 lparams {
+                                    weight = 1f
+                                 }
+                                 hint = ctx.getString(R.string.label_regex)
+                              }
+                              button {
+                                 text = ctx.getString(R.string.button_add)
+                                 onClick {
+                                    val d = link.text.trim().toString()
+                                    when (true) {
+                                       d.isEmpty() ->
+                                          toast(R.string.toast_empty_input)
+                                       lf.contains(d) ->
+                                          toast(R.string.toast_rule_already_exist)
+                                       else -> {
+                                          toast(ctx.getString(R.string.toast_added, d))
+                                          Main.log("Added \"$d\" to filter", Pref.Debug)
+                                          lf.add(d)
+                                          Pref.updateLinkFilter()
+                                          x.add(d)
+                                          x.sort()
+                                          aa.notifyDataSetChanged()
+                                       }
+                                    }
                                  }
                               }
                            }
-                           negativeButton(R.string.button_cancel) {}
                         }
                      }
+
+                  }.show().dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+               }
+               onLongClick {
+                  alert(R.string.filter_link_help, R.string.filter_link) {
+                     positiveButton(R.string.button_ok) {}
                   }.show()
+                  true
                }
             }
 
             with(CLabel(ctx, Const.id.App_Filter, R.string.filter_app)) {
                lparams {
-                  height = ColumnHeight
                   width = matchParent
+                  height = ColumnHeight
                   alignParentLeft()
                   below(Const.id.Link_Filter)
                }
                onClick {
-                  if (af.isNotEmpty()) {
-                     val appNameList = arrayListOf<String>()
-                     af.forEach {
-                        if (Main.isPackageInstalled(it, ctx.packageManager)) {
-                           val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
-                           appNameList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " + it)
-                        } else {
-                           af.remove(it)
-                        }
-                        Pref.updateAppFilter()
-                     }
-                     appNameList.sortBy(String::toLowerCase)
-                     selector(ctx.getString(R.string.list_filter_app), appNameList) {
-                        i: Int ->
-                        alert {
-                           customView {
-                              verticalLayout {
-                                 padding = dip(24)
-                                 val app = appNameList[i].split("\n ")
-                                 textView {
-                                    text = ctx.getString(R.string.dialog_remove_confirm, app[0])
-                                 }
-                                 positiveButton(R.string.button_confirm) {
-                                    toast(ctx.getString(R.string.toast_removed, app[0]))
-                                    Main.log("Removed \"${app[0]} | ${app[1]}\" from filter", Pref.Debug)
-                                    af.remove(app[1])
-                                    Pref.updateAppFilter()
-                                 }
-                                 negativeButton(R.string.button_cancel) {}
-                              }
-                           }
-                        }.show()
-                     }
-                  } else {
-                     toast(R.string.toast_empty_filter)
-                  }
-               }
-            }
-
-            with(CLabel(ctx, Const.id.App_Filter_Add, "+")) {
-               lparams {
-                  width = dip(36)
-                  rightMargin = dip(20)
-                  height = ColumnHeight
-                  alignParentRight()
-                  below(Const.id.Link_Filter_Add)
-               }
-               padding = 0
-               gravity = Gravity.CENTER
-               textSize = sp(10).toFloat()
-               onClick {
-                  val appNameList = arrayListOf<String>()
-                  loop@ for (l in ctx.packageManager.getInstalledPackages(0)) {
-                     when (true) {
-                        Pref.IgnoreSystemApp &&
-                                ((l.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1) ->
-                           continue@loop
-                        af.contains(l.packageName) ->
-                           continue@loop
-                     }
-                     appNameList.add(
-                             ctx.packageManager.getApplicationLabel(l.applicationInfo).toString() + "\n " +
-                                     l.packageName)
-                  }
-                  appNameList.sortBy(String::toLowerCase)
                   alert {
                      customView {
                         verticalLayout {
-                           padding = dip(12)
-                           val aa = ArrayAdapter<String>(
-                                   ctx,
-                                   android.R.layout.simple_list_item_1,
-                                   ArrayList<String>(appNameList))
-                           listView {
-                              title(R.string.selector_app)
-                              adapter(aa) {
-                                 val item = aa.getItem(it).split("\n ")
-                                 if (item[1] in af) {
-                                    toast(R.string.toast_rule_already_exist)
-                                 } else {
-                                    Main.log("Added \"${item[0]} | ${item[1]}\" to filter", Pref.Debug)
-                                    toast(ctx.getString(R.string.toast_added, item[0]))
-                                    af.add(item[1])
-                                    Pref.updateAppFilter()
-                                 }
+                           lparams {
+                              height = matchParent
+                              verticalPadding = dip(16)
+                           }
+                           val appList = arrayListOf<String>()
+
+                           af.forEach {
+                              if (Main.isPackageInstalled(it, ctx.packageManager)) {
+                                 val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
+                                 appList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " + it)
+                              } else {
+                                 af.remove(it)
                               }
                            }
-                           relativeLayout {
-                              val s = editText {
-                                 hint = ctx.getString(R.string.label_search)
-                                 singleLine = true
-                              }.lparams {
-                                 alignParentLeft()
+                           Pref.updateAppFilter()
+
+                           loop@ for (l in ctx.packageManager.getInstalledPackages(0)) {
+                              when (true) {
+                                 Pref.IgnoreSystemApp &&
+                                         ((l.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1) ->
+                                    continue@loop
+                                 af.contains(l.packageName) ->
+                                    continue@loop
+                                 else ->
+                                    appList.add(
+                                            ctx.packageManager.getApplicationLabel(l.applicationInfo).toString() + "\n " + l.packageName)
+                              }
+                           }
+
+                           val cla = CheckableListAdapter(appList, ctx) {
+                              adapter, view, pos, isChecked ->
+                              val item = adapter.getItem(pos)!!.split("\n ")
+                              if (item[1] in af) {
+                                 Main.log("Removed '${item[0]} | ${item[1]}' from filter", Pref.Debug)
+                                 toast(ctx.getString(R.string.toast_removed, item[0]))
+                                 af.remove(item[1])
+                              } else {
+                                 Main.log("Added '${item[0]} | ${item[1]}' to filter", Pref.Debug)
+                                 toast(ctx.getString(R.string.toast_added, item[0]))
+                                 af.add(item[1])
+                              }
+                              Pref.updateAppFilter()
+                           }
+                           for (i in 0..af.size - 1) {
+                              cla.isSelected[i] = true
+                           }
+                           title(R.string.list_filter_app)
+                           listView {
+                              divider = null
+                              isVerticalScrollBarEnabled = false
+                              lparams {
+                                 height = 0
+                                 weight = 1f
                                  width = matchParent
                               }
-                              s.addTextChangedListener(
-                                      object : TextWatcher {
-                                         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                                         }
+                              adapter = cla
+                           }
+                           editText {
+                              maxLines = 1
+                              inputType = android.text.InputType.TYPE_CLASS_TEXT
+                              lparams {
+                                 width = matchParent
+                                 horizontalMargin = dip(4)
+                              }
+                              hint = ctx.getString(R.string.label_search)
+                              addTextChangedListener(object : TextWatcher {
+                                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                                 }
 
-                                         override fun afterTextChanged(p0: Editable?) {
-                                         }
+                                 override fun afterTextChanged(p0: Editable?) {
+                                 }
 
-                                         override
-                                         fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                                            aa.clear()
-                                            //TODO 待優化...
-                                            val s2 = Pattern.compile(Pattern.quote(p0.toString()), Pattern.CASE_INSENSITIVE)
-                                            aa.addAll(appNameList.filter {
-                                               s2.matcher(it).find()
-                                            })
-                                         }
-                                      }
-                              )
+                                 override fun onTextChanged(cs: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
+                                    cla.filter.filter(cs)
+                                 }
+                              })
                            }
                         }
                      }
-                  }.show().dialog!!.window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                  }.show().dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+               }
+               onLongClick {
+                  alert(R.string.filter_app_help, R.string.filter_app) {
+                     positiveButton(R.string.button_ok) {}
+                  }.show()
+                  true
                }
             }
 
@@ -512,12 +545,17 @@ class MainUi : AnkoComponent<Main> {
                below(Const.id.App_Filter)
             }
 
-            CLabel(ctx, Const.id.About_Version, "${ctx.getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}")
+            val ver = CLabel(ctx, Const.id.About_Version, "${ctx.getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}")
                     .lparams {
                        height = ColumnHeight
                        width = matchParent
                        below(Const.id.About_Label)
-                    }.textColor = getColor(ctx, R.color.label_about_text)
+                    }
+            ver.textColor = getColor(ctx, R.color.label_about_text)
+            ver.onLongClick {
+               toast("Why you think there is any explanation?")
+               true
+            }
             val s = String(android.util.Base64.decode(ctx.getString(R.string.Info), 0)).split("|")
             var i = 1
             CLabel(ctx, Const.id.About_Author, String(Base64.decode(s[--i], 0)))
