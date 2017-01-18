@@ -455,13 +455,17 @@ class MainUi : AnkoComponent<Main> {
                            }
                            val appList = arrayListOf<String>()
 
+                           val toBeRemove = mutableSetOf<String>()
                            af.forEach {
                               if (Main.isPackageInstalled(it, ctx.packageManager)) {
                                  val appInfo = ctx.packageManager.getApplicationInfo(it, 0)
                                  appList.add(ctx.packageManager.getApplicationLabel(appInfo).toString() + "\n " + it)
                               } else {
-                                 af.remove(it)
+                                 toBeRemove.add(it)
                               }
+                           }
+                           toBeRemove.forEach {
+                              af.remove(it)
                            }
                            Pref.updateAppFilter()
 
