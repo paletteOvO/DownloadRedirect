@@ -15,3 +15,5 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-verbose
+-dontwarn net.manhong2112.downloadredirect.**

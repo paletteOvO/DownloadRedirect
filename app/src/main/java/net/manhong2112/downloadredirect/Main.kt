@@ -121,7 +121,7 @@ class MainUi : AnkoComponent<Main> {
            CSwitch(viewId, resources.getString(textResId))
 
    override fun createView(ui: AnkoContext<Main>) = with(ui) {
-      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", 1))
+      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", 0))
       val af = Pref.AppFilter
       val lf = Pref.LinkFilter
 
