@@ -23,7 +23,7 @@ abstract class DLApi {
       return -1
    }
 
-   abstract fun addDownload(ctx: Context, url: Uri): Boolean
+   abstract fun addDownload(ctx: Context, url: Uri, cookies: String): Boolean
    open fun isExist(ctx: Context): Boolean {
       return getVersion(ctx) != -1
    }

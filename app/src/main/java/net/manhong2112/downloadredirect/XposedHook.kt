@@ -80,7 +80,13 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          val appFilter = Pref.AppFilter
          val linkFilter = Pref.LinkFilter
          log("received download request", Pref.Debug)
-         val mUri = getObjectField(param.args[0], "mUri") as Uri
+         val req = param.args[0] as DownloadManager.Request
+         val mUri = getObjectField(req, "mUri") as Uri
+         val cookies = with((getObjectField(req, "mRequestHeaders") as List<Pair<String, String>>).filter {
+                           it.first == "Cookies"
+                       }) {
+                           if(size==0) "" else get(0).second
+                       }
          when(true) {
             existingDownloader.isEmpty() -> {
                log("do not detected any supported downloader, aborted", Pref.Debug)
@@ -145,9 +151,9 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          val choseAPI = Pref.Downloader
          val v:Boolean
          if (existingDownloader.contains(choseAPI)) {
-            v = (existingApi[existingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri)
+            v = (existingApi[existingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri, cookies)
          } else {
-            v = (existingApi[0].newInstance() as DLApi).addDownload(ctx, mUri)
+            v = (existingApi[0].newInstance() as DLApi).addDownload(ctx, mUri, cookies)
             val i = Intent(Const.ACTION_RESET_DOWNLOADER)
             i.addCategory(Intent.CATEGORY_DEFAULT)
             ctx.sendBroadcast(i)

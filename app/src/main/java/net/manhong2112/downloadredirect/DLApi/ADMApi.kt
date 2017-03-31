@@ -28,12 +28,13 @@ class ADMApi : DLApi() {
       return -1
    }
 
-   override fun addDownload(ctx: Context, url: Uri): Boolean {
+   override fun addDownload(ctx: Context, url: Uri, cookies: String): Boolean {
       if (!isExist(ctx)) {
          return false
       }
 
       val intent = Intent(ACTION_DOWNLOAD_REDIRECT, url)
+      intent.putExtra("Cookies", cookies)
       intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       intent.addCategory(Intent.CATEGORY_DEFAULT)
 

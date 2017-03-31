@@ -14,7 +14,7 @@ class LoaderDroidApi : DLApi() {
    private val ACTION_ADD_LOADING = "org.zloy.android.downloader.action.ADD_LOADING"
    override val PACKAGE_NAME = "org.zloy.android.downloader"
 
-   override fun addDownload(ctx: Context, url: Uri): Boolean {
+   override fun addDownload(ctx: Context, url: Uri, cookies: String): Boolean {
       if (!isExist(ctx)) {
          return false
       }
@@ -22,6 +22,7 @@ class LoaderDroidApi : DLApi() {
       val intent = Intent(ACTION_ADD_LOADING, url)
       intent.putExtra("ask_for_directory", true)
       intent.putExtra("allowed_connection", 1)
+      intent.putExtra("cookies", cookies)
       intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
       try {

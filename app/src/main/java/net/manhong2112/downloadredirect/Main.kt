@@ -1,5 +1,6 @@
 package net.manhong2112.downloadredirect
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -74,6 +75,7 @@ class Main : Activity() {
 }
 
 class MainUi : AnkoComponent<Main> {
+   @SuppressLint("NewApi")
    fun getColor(ctx: Context, id: Int): Int {
       if (Const.VER_GE_MARSHMALLOW) {
          return ctx.getColor(id)
