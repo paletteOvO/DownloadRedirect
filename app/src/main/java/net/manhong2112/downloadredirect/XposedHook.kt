@@ -80,9 +80,8 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          val appFilter = Pref.AppFilter
          val linkFilter = Pref.LinkFilter
          log("received download request", Pref.Debug)
-         val req = param.args[0] as DownloadManager.Request
-         val mUri = getObjectField(req, "mUri") as Uri
-         val cookies = with((getObjectField(req, "mRequestHeaders") as List<Pair<String, String>>).filter {
+         val mUri = getObjectField(param.args[0], "mUri") as Uri
+         val cookies = with((getObjectField(param.args[0], "mRequestHeaders") as List<android.util.Pair<String, String>>).filter {
                            it.first == "Cookies"
                        }) {
                            if(size==0) "" else get(0).second

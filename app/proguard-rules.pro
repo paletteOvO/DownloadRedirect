@@ -17,3 +17,5 @@
 #}
 -verbose
 -dontwarn net.manhong2112.downloadredirect.**
+-keep class net.manhong2112.downloadredirect.XposedHook {*;}
+-optimizationpasses 99
