@@ -10,9 +10,9 @@ import net.manhong2112.downloadredirect.Const.ACTION_DOWNLOAD_REDIRECT
  * Created by manhong2112 on 12/4/2016.
  */
 
-class ADMApi : DLApi() {
+class ADMProApi : DLApi() {
    override val APP_NAME = "ADM"
-   override val PACKAGE_NAME = "com.dv.adm"
+   override val PACKAGE_NAME = "com.dv.adm.pay"
 
    override fun addDownload(ctx: Context, url: Uri, cookies: String): Boolean {
       if (!isExist(ctx)) {

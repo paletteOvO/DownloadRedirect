@@ -11,6 +11,7 @@ import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import net.manhong2112.downloadredirect.DLApi.ADMApi
+import net.manhong2112.downloadredirect.DLApi.ADMProApi
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import java.util.*
 
@@ -177,7 +178,7 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          }
          val packageName = getObjectField(param.result, "packageName")
          if (packageName != ADMApi().PACKAGE_NAME &&
-                 packageName != ADMApi().PACKAGE_NAME_PAY) {
+                 packageName != ADMProApi().PACKAGE_NAME) {
             return
          }
          log("found ADM package")

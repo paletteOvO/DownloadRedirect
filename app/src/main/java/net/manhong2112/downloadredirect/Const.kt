@@ -2,6 +2,7 @@ package net.manhong2112.downloadredirect
 
 import android.os.Build
 import net.manhong2112.downloadredirect.DLApi.ADMApi
+import net.manhong2112.downloadredirect.DLApi.ADMProApi
 import net.manhong2112.downloadredirect.DLApi.LoaderDroidApi
 
 /**
@@ -16,7 +17,7 @@ object Const {
    val VER_GE_LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
    val VER_GE_MARSHMALLOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
-   val ApiList = setOf(ADMApi::class.java, LoaderDroidApi::class.java)
+   val ApiList = setOf(ADMApi::class.java, ADMProApi::class.java, LoaderDroidApi::class.java)
 
    object id {
       val Pref_Page = 0
