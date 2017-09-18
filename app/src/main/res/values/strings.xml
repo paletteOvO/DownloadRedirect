@@ -9,8 +9,10 @@
     <string name="switch_hide_app_icon">Hide app from launcher</string>
     <string name="switch_white_list">Enable WhiteList</string>
     <string name="switch_ignore_system_app">Ignore System App</string>
+    <string name="switch_not_specify_downloader">Not Specify Downloader</string>
     <string name="list_change_downloader">Change Downloader</string>
     <string name="selector_downloader">Select Downloader</string>
+
 
     <string name="dialog_remove_confirm">Are you sure you want to remove \"%s\" from the list?</string>
 
@@ -35,9 +37,6 @@
 
 
     <string name="button_add">Add</string>
-    <string name="button_confirm">Confirm</string>
-    <string name="button_ok">OK</string>
-    <string name="button_cancel">Cancel</string>
 
     <string name="label_regex">Regular Expression</string>
     <string name="label_about">About</string>

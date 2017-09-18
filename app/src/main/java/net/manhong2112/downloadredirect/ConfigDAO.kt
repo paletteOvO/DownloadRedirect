@@ -1,9 +1,12 @@
 package net.manhong2112.downloadredirect
 
-import android.content.Context
 import android.content.SharedPreferences
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import de.robv.android.xposed.XSharedPreferences
-import net.manhong2112.downloadredirect.DLApi.DLApi
+import net.manhong2112.downloadredirect.DLApi.DownloadConfig
+import java.util.*
 
 /**
  * Created by manhong2112 on 18/7/2016.
@@ -21,13 +24,25 @@ class ConfigDAO(pref: SharedPreferences) {
    }
 
    private val Pref = pref
-   private var ExistingDownloader: List<String>? = null
-   fun getExistingDownloader(ctx: Context): List<String> {
-      ExistingDownloader = ExistingDownloader ?:
-              Const.ApiList
-                      .filter { (it.newInstance() as DLApi).isExist(ctx) }
-                      .map { (it.newInstance() as DLApi).APP_NAME }
-      return ExistingDownloader!!
+   val DownloadConfigs: HashMap<String, DownloadConfig> by lazy {
+      val mapper = ObjectMapper().registerModule(KotlinModule())
+      val k = pref.getStringSet("DownloadConfigs", null) ?: return@lazy Const.defaultDownloadConfig
+      val map = HashMap<String, DownloadConfig>()
+      k.forEach {
+         i ->
+            val v: DownloadConfig = mapper.readValue(i)
+            map[v.name] = v
+      }
+      return@lazy map
+   }
+
+   fun updateDownloadConfigs() {
+      val mapper = ObjectMapper().registerModule(KotlinModule())
+      val set: Set<String> = DownloadConfigs.values.map {
+         i: DownloadConfig ->
+            mapper.writerWithDefaultPrettyPrinter().writeValueAsString(i)
+      }.toSet()
+      Pref.edit().putStringSet("DownloadConfigs", set).apply()
    }
 
    val LinkFilter by lazy {
@@ -45,11 +60,18 @@ class ConfigDAO(pref: SharedPreferences) {
          Pref.edit().putBoolean("Experiment", b).apply()
       }
 
+   var NotSpecifyDownloader = Pref.getBoolean("NotSpecifyDownloader", false)
+      get() = field
+      set(b) {
+         field = b
+         Pref.edit().putBoolean("NotSpecifyDownloader", b).apply()
+      }
 
    var Debug = Pref.getBoolean("Debug", false)
       get() = field
       set(b) {
          field = b
+         Main.DEBUG = b
          Pref.edit().putBoolean("Debug", b).apply()
       }
 
@@ -60,16 +82,12 @@ class ConfigDAO(pref: SharedPreferences) {
          Pref.edit().putBoolean("HideIcon", b).apply()
       }
 
-   var Downloader: String? = null
+   var SelectedDownloader: DownloadConfig = DownloadConfigs[Pref.getString("SelectedDownloader", "ADM")]!!
+      get() = field
       set(s) {
          field = s
-         Pref.edit().putString("Downloader", s).apply()
+         Pref.edit().putString("SelectedDownloader", s.name).apply()
       }
-
-   fun getDownloader(ctx: Context): String {
-      Downloader = Downloader ?: Pref.getString("Downloader", null) ?: getExistingDownloader(ctx).first()
-      return Downloader!!
-   }
 
    var UsingWhiteList_Link = Pref.getBoolean("UsingWhiteList_Link", false)
       get() = field

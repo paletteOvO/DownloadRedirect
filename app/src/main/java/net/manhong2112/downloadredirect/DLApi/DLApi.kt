@@ -1,30 +1,97 @@
 package net.manhong2112.downloadredirect.DLApi
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import net.manhong2112.downloadredirect.Main
 
 /**
- * Created by manhong2112 on 14/4/2016.
- * Base Download Api
+ * Created by manhong2112 on 12/9/2017.
  */
-abstract class DLApi {
-   abstract val PACKAGE_NAME: String
-   abstract val APP_NAME: String
 
-   open fun getVersion(ctx: Context): Int {
-      val packageManager = ctx.packageManager ?: return -1
-      val packages = packageManager.getInstalledPackages(0)
-      packages.forEach {
-         when (it.packageName) {
-            PACKAGE_NAME ->
-               return it.versionCode
+typealias Name = String
+typealias Value = String
+typealias Header = List<Pair<String, String>>
+
+object DLApi {
+   operator fun <F, S> android.util.Pair<F, S>.component1(): F {
+      return this.first
+   }
+
+   operator fun <F, S> android.util.Pair<F, S>.component2(): S {
+      return this.second
+   }
+
+   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<android.util.Pair<String, String>>): Boolean {
+      Main.log("addDownload(Context, Uri, List)")
+      val intent = Intent(Intent.ACTION_VIEW, url)
+      mRequestHeaders.forEach {
+         (name, value) ->
+         when (name.toLowerCase()) {
+            "cookies", "cookie" -> {
+               intent.putExtra("Cookies", value)
+               intent.putExtra("cookies", value)
+               intent.putExtra("Cookie", value)
+               intent.putExtra("cookie", value)
+               Main.log("Put 'Cookie' -> ${value}")
+            }
+            "referer" -> {
+               intent.putExtra("referer", value)
+               intent.putExtra("Referer", value)
+               Main.log("Put 'Referer' -> ${value}")
+            }
+            else -> {
+               intent.putExtra(name, value)
+               Main.log("Put ${name} -> ${value}")
+            }
          }
       }
-      return -1
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      intent.addCategory(Intent.CATEGORY_DEFAULT)
+
+      return try {
+         ctx.startActivity(intent)
+         true
+      } catch (e: ActivityNotFoundException) {
+         false
+      }
    }
 
-   abstract fun addDownload(ctx: Context, url: Uri, cookies: String): Boolean
-   open fun isExist(ctx: Context): Boolean {
-      return getVersion(ctx) != -1
+   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<android.util.Pair<String, String>>, downloadConfig: DownloadConfig): Boolean {
+      Main.log("addDownload(Context, Uri, List, DownloadConfig)")
+      val intent = Intent(downloadConfig.intent, url)
+      intent.`package` = downloadConfig.packageName
+      mRequestHeaders.forEach {
+         (name, value) ->
+         when (name.toLowerCase()) {
+            "cookies", "cookie" -> {
+               val k = downloadConfig.headers.firstOrNull { (name, _) -> name == "Cookie" }?.second ?: ""
+               intent.putExtra(k, value)
+               Main.log("Put ${k} -> ${value}")
+            }
+            "referer" -> {
+               val k = downloadConfig.headers.firstOrNull { (name, _) -> name == "Referer" }?.second ?: ""
+               intent.putExtra(k, value)
+               Main.log("Put ${k} -> ${value}")
+            }
+            else -> {
+               intent.putExtra(name, value)
+               Main.log("Put ${name} -> ${value}")
+            }
+         }
+      }
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      intent.addCategory(Intent.CATEGORY_DEFAULT)
+
+      return try {
+         ctx.startActivity(intent)
+         true
+      } catch (e: ActivityNotFoundException) {
+         false
+      }
    }
+
 }
+
+

@@ -10,8 +10,6 @@ import android.net.Uri
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage
-import net.manhong2112.downloadredirect.DLApi.ADMApi
-import net.manhong2112.downloadredirect.DLApi.ADMProApi
 import net.manhong2112.downloadredirect.DLApi.DLApi
 import java.util.*
 
@@ -45,13 +43,13 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
       }
    }
 
-   fun log(str: String, DEBUG: Boolean = true) {
-      if (DEBUG) {
-         XposedBridge.log("DownloadRedirect -> $str")
-      }
+   fun log(str: String) {
+      Main.log("DownloadRedirect -> $str")
    }
+   
    @Throws(Throwable::class)
    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
+
       val Pref = ConfigDAO.getPref()
       log("module initing")
       log("hooking android.app.DownloadManager.enqueue()")
@@ -77,89 +75,72 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
       override fun beforeHookedMethod(param: MethodHookParam) {
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = ConfigDAO.getPref()
-         val existingDownloader = Pref.getExistingDownloader(ctx)
+         Main.DEBUG = Pref.Debug
          val appFilter = Pref.AppFilter
          val linkFilter = Pref.LinkFilter
-         log("received download request", Pref.Debug)
+         log("received download request")
          val mUri = getObjectField(param.args[0], "mUri") as Uri
-         val cookies = with((getObjectField(param.args[0], "mRequestHeaders") as List<android.util.Pair<String, String>>).filter {
-                           it.first == "Cookies"
-                       }) {
-                           if(size==0) "" else get(0).second
-                       }
+         val mRequestHeaders = getObjectField(param.args[0], "mRequestHeaders") as List<android.util.Pair<String, String>>
+
          when(true) {
-            existingDownloader.isEmpty() -> {
-               log("do not detected any supported downloader, aborted", Pref.Debug)
-               return
-            }
             (Pref.IgnoreSystemApp &&
                     ((ctx.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 1)) -> {
-               log("enabled ignore system & detected system app, aborted", Pref.Debug)
+               log("enabled ignore system & detected system app, aborted")
                return
             }
          }
 
          if (Pref.UsingWhiteList_App) {
-            log("filtering app with whitelist rule", Pref.Debug)
+            log("filtering app with whitelist rule")
             if (!appFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
-               log("app is not in the list, aborted", Pref.Debug)
+               log("app is not in the list, aborted")
                return
             }
          } else {
-            log("filtering app with blacklist rule", Pref.Debug)
+            log("filtering app with blacklist rule")
             if (appFilter.contains(AndroidAppHelper.currentApplication().packageName)) {
-               log("app is in the list, aborted", Pref.Debug)
+               log("app is in the list, aborted")
                return
             }
          }
 
          if (Pref.UsingWhiteList_Link) {
-            log("Matching link with whitelist rule", Pref.Debug)
+            log("Matching link with whitelist rule")
             var not_match = true
             linkFilter.forEach {
-               Main.log("Matching -> $it", Pref.Debug)
+               Main.log("Matching -> $it")
                if (mUri.toString().matches(it.toRegex())) {
                   not_match = false
                   return@forEach
                }
             }
             if (not_match) {
-               log("doesn't matched any regex, aborted", Pref.Debug)
+               log("doesn't matched any regex, aborted")
                return
             }
          } else {
-            log("Matching link with blacklist rule", Pref.Debug)
+            log("Matching link with blacklist rule")
             linkFilter.forEach {
-               Main.log("Matching -> $it", Pref.Debug)
+               log("Matching -> $it")
                if (mUri.toString().matches(it.toRegex())) {
-                  log("matched $it, aborted", Pref.Debug)
+                  log("matched $it, aborted")
                   return
                }
             }
          }
 
-         log("Url to be redirected -> $mUri", Pref.Debug)
-         val existingApi = Const.ApiList.filterTo(LinkedList<Class<*>>()) {
-            (it.newInstance() as DLApi).isExist(ctx)
-         }
+         log("Url to be redirected -> $mUri")
+         val selectedDownloader = Pref.SelectedDownloader
+         log("Selected Downloader -> name -> ${selectedDownloader.name}")
+         log("Selected Downloader -> intent -> ${selectedDownloader.intent}")
+         log("NotSpecifyDownloader -> ${Pref.NotSpecifyDownloader}")
 
-         if (existingApi.isEmpty()) {
-            log("doesn't exist any downloader, aborted", Pref.Debug)
-            return
-         }
-
-         val choseAPI = Pref.Downloader
-         val v:Boolean
-         if (existingDownloader.contains(choseAPI)) {
-            v = (existingApi[existingDownloader.indexOf(choseAPI)].newInstance() as DLApi).addDownload(ctx, mUri, cookies)
-         } else {
-            v = (existingApi[0].newInstance() as DLApi).addDownload(ctx, mUri, cookies)
-            val i = Intent(Const.ACTION_RESET_DOWNLOADER)
-            i.addCategory(Intent.CATEGORY_DEFAULT)
-            ctx.sendBroadcast(i)
-         }
-
-         log("Redirection: ${if (v) "Success" else "Failed"}", Pref.Debug)
+         val v = if(Pref.NotSpecifyDownloader)
+                  DLApi.addDownload(ctx, mUri, mRequestHeaders)
+                 else
+                  (DLApi.addDownload(ctx, mUri, mRequestHeaders, selectedDownloader) or
+                  DLApi.addDownload(ctx, mUri, mRequestHeaders))
+         log("Redirection: ${if (v) "Success" else "Failed"}")
          if (v) {
             param.result = 0
          }
@@ -170,28 +151,27 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
       @Throws(Throwable::class)
       override fun afterHookedMethod(param: MethodHookParam) {
          val ActivityIntentInfo = findClass("android.content.pm.PackageParser\$ActivityIntentInfo", null)
-         val DEBUG: Boolean = ConfigDAO.getPref().Debug
          if(param.result == null) {
-            log("param.result is null", DEBUG)
-            log("${param.args[0]}", DEBUG)
+            log("param.result is null")
+            log("${param.args[0]}")
             return
          }
          val packageName = getObjectField(param.result, "packageName")
-         if (packageName != ADMApi().PACKAGE_NAME &&
-                 packageName != ADMProApi().PACKAGE_NAME) {
+         if (packageName != Const.PACKAGE_NAME_ADM &&
+                 packageName != Const.PACKAGE_NAME_ADMPro) {
             return
          }
          log("found ADM package")
          val activities = getObjectField(param.result, "activities") as ArrayList<*>
          if (activities.isEmpty()) return
          // List of Activity
-         log("searching com.dv.adm{|.pay}.AEditor at ${param.args[0]}", DEBUG)
+         log("searching com.dv.adm{|.pay}.AEditor at ${param.args[0]}")
          for (activity in activities) {
             // obj.activity
             val info = getObjectField(activity, "info") as ActivityInfo
             when (info.name) {
                "com.dv.adm.pay.AEditor", "com.dv.adm.AEditor" -> {
-                  log("Injecting Redirect Intent", DEBUG)
+                  log("Injecting Redirect Intent")
                   val intent = newInstance(ActivityIntentInfo, activity) as IntentFilter
                   intent.addDataScheme("http")
                   intent.addDataScheme("https")
@@ -199,7 +179,7 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
                   intent.addCategory(Intent.CATEGORY_DEFAULT)
 
                   callMethod(getObjectField(activity, "intents"), "add", intent)
-                  log("Injected Redirect Intent", DEBUG)
+                  log("Injected Redirect Intent")
                   return
                }
             }

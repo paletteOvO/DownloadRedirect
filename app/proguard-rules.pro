@@ -16,6 +16,20 @@
 #   public *;
 #}
 -verbose
--dontwarn net.manhong2112.downloadredirect.**
+-dontnote **
+-dontwarn **
 -keep class net.manhong2112.downloadredirect.XposedHook {*;}
+-keep class net.manhong2112.downloadredirect.DLApi.DownloadConfig {*;}
+
 -optimizationpasses 99
+-dontoptimize
+
+
+-keep class kotlin.Metadata { *; }
+
+-keepattributes *Annotation*
+-keep class org.jetbrains.kotlin.** { *; }
+-keep class org.jetbrains.annotations.** { *; }
+-keepclassmembers class ** {
+  @org.jetbrains.annotations.ReadOnly public *;
+}

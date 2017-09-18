@@ -21,7 +21,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
             zipAlignEnabled true
@@ -31,8 +31,21 @@ android {
         applicationId "net.manhong2112.downloadredirect"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 60
-        versionName "1.2.3.fina|･ω･｀)"
+        versionCode 65
+        versionName "1.3.0(ゝ∀･)"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
     }
 }
 
@@ -57,6 +70,10 @@ dependencies {
     compile "org.jetbrains.anko:anko-sdk23:$anko_version"
     // compile "org.jetbrains.anko:anko-common:$anko_version"
     // compile "com.android.support:support-v4:23.0.+"
+
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
+
+
     testCompile 'junit:junit:4.12'
     provided files('lib/XposedBridgeApi-54.jar')
 }
