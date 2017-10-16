@@ -24,7 +24,6 @@
 -optimizationpasses 99
 -dontoptimize
 
-
 -keep class kotlin.Metadata { *; }
 
 -keepattributes *Annotation*

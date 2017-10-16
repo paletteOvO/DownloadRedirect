@@ -42,24 +42,9 @@ class Main : Activity() {
    }
 
    companion object {
-      @JvmStatic
-      var DEBUG: Boolean = false
-      val logcatFile = File(Const.LOGCAT_PATH)
-      object Logger {
-         fun log(msg: String) {
-            if(logcatFile.exists()) {
-               logcatFile.appendText(msg)
-               logcatFile.appendText("\n")
-            } else if(logcatFile.createNewFile()) {
-                log(msg)
-            }
-         }
-      }
-
-      fun log(str: String) {
-         if (DEBUG) {
+      fun log(str: String, debug: Boolean = false) {
+         if (debug) {
             Log.i("Xposed", "DownloadRedirect -> $str")
-            Logger.log("DownloadRedirect -> $str")
          }
       }
 
@@ -209,10 +194,9 @@ class MainUi : AnkoComponent<Main> {
    }
 
    override fun createView(ui: AnkoContext<Main>) = with(ui) {
-      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", 0))
+      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", if(Const.VER_GE_N) 0 else 1))
       val af = Pref.AppFilter
       val lf = Pref.LinkFilter
-      Main.DEBUG = Pref.Debug
       val ColumnHeight = dip(48)
       val SubTitleHeight = dip(36)
 
@@ -247,12 +231,6 @@ class MainUi : AnkoComponent<Main> {
                onClick {
                   Pref.Debug = (it as Switch).isChecked
                }
-               onLongClick {
-                  showAlert(R.string.debug_logging_help, R.string.switch_debug_logging) {
-                     positiveButton(android.R.string.ok) {}
-                  }
-                  true
-               }
             }
 
             prefSwitch(Const.id.Debug_Experiment_Switch, R.string.switch_debug_experiment) {
@@ -264,12 +242,6 @@ class MainUi : AnkoComponent<Main> {
                }
                onClick {
                   Pref.Experiment = (it as Switch).isChecked
-               }
-               onLongClick {
-                  showAlert(R.string.debug_experiment_help, R.string.switch_debug_experiment) {
-                     positiveButton(android.R.string.ok) {}
-                  }
-                  true
                }
             }
 
@@ -291,12 +263,6 @@ class MainUi : AnkoComponent<Main> {
                      Main.displayIcon(ctx)
                   }
                }
-               onLongClick {
-                  alert(R.string.pref_hide_icon_help, R.string.switch_hide_app_icon) {
-                     positiveButton(android.R.string.ok) {}
-                  }.show()
-                  true
-               }
                lparams {
                   below(Const.id.Pref_Label)
                   width = matchParent
@@ -309,12 +275,6 @@ class MainUi : AnkoComponent<Main> {
                isChecked = Pref.IgnoreSystemApp
                onClick {
                   Pref.IgnoreSystemApp = (it as Switch).isChecked
-               }
-               onLongClick {
-                  alert(R.string.pref_hide_ignore_system_app_help, R.string.switch_ignore_system_app) {
-                     positiveButton(android.R.string.ok) {}
-                  }.show()
-                  true
                }
                lparams {
                   width = matchParent
@@ -460,12 +420,6 @@ class MainUi : AnkoComponent<Main> {
                      }
                   }
                }
-               onLongClick {
-                  alert(R.string.filter_whitelist_help, R.string.switch_white_list) {
-                     positiveButton(android.R.string.ok) {}
-                  }.show()
-                  true
-               }
             }
 
             label(ctx, Const.id.Link_Filter, R.string.filter_link) {
@@ -549,12 +503,6 @@ class MainUi : AnkoComponent<Main> {
                      }
 
                   }.dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-               }
-               onLongClick {
-                  alert(R.string.filter_link_help, R.string.filter_link) {
-                     positiveButton(android.R.string.ok) {}
-                  }.show()
-                  true
                }
             }
 
@@ -651,12 +599,6 @@ class MainUi : AnkoComponent<Main> {
                         }
                      }
                   }.dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-               }
-               onLongClick {
-                  alert(R.string.filter_app_help, R.string.filter_app) {
-                     positiveButton(android.R.string.ok) {}
-                  }.show()
-                  true
                }
             }
 

@@ -15,8 +15,8 @@ object Const {
    // version greater or equal than xxx
    val VER_GE_LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
    val VER_GE_MARSHMALLOW = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+   val VER_GE_N = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
-   val LOGCAT_PATH = Environment.getExternalStorageDirectory().path + "/download_redirect.log"
    const val PACKAGE_NAME_ADM = "com.dv.adm"
    const val PACKAGE_NAME_ADMPro = "com.dv.adm.pay"
    val defaultDownloadConfig: HashMap<String, DownloadConfig> by lazy {

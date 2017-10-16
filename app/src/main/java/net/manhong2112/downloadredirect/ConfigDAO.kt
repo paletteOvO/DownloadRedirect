@@ -68,10 +68,11 @@ class ConfigDAO(pref: SharedPreferences) {
       }
 
    var Debug = Pref.getBoolean("Debug", false)
-      get() = field
+      get() {
+         return field
+      }
       set(b) {
          field = b
-         Main.DEBUG = b
          Pref.edit().putBoolean("Debug", b).apply()
       }
 

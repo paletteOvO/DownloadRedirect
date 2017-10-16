@@ -20,6 +20,9 @@ import java.util.*
  */
 @Suppress("UNCHECKED_CAST")
 class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
+   fun log(str: String, debug: Boolean = false) {
+      Main.log(str, debug)
+   }
    override fun handleLoadPackage(params: XC_LoadPackage.LoadPackageParam?) {
       val Pref = ConfigDAO.getPref()
       if (Pref.Experiment &&
@@ -43,14 +46,12 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
       }
    }
 
-   fun log(str: String) {
-      Main.log("DownloadRedirect -> $str")
-   }
-   
    @Throws(Throwable::class)
    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
-
       val Pref = ConfigDAO.getPref()
+      fun log(str: String) {
+         Main.log(str, Pref.Debug)
+      }
       log("module initing")
       log("hooking android.app.DownloadManager.enqueue()")
 
@@ -75,7 +76,9 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
       override fun beforeHookedMethod(param: MethodHookParam) {
          val ctx = AndroidAppHelper.currentApplication()
          val Pref = ConfigDAO.getPref()
-         Main.DEBUG = Pref.Debug
+         fun log(str: String) {
+            Main.log(str, Pref.Debug)
+         }
          val appFilter = Pref.AppFilter
          val linkFilter = Pref.LinkFilter
          log("received download request")
