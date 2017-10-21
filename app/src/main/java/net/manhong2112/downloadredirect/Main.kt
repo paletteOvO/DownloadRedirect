@@ -22,7 +22,6 @@ import android.widget.Switch
 import android.widget.TextView
 import net.manhong2112.downloadredirect.DLApi.DownloadConfig
 import org.jetbrains.anko.*
-import java.io.File
 
 
 /**
@@ -42,7 +41,7 @@ class Main : Activity() {
    }
 
    companion object {
-      fun log(str: String, debug: Boolean = false) {
+      fun log(str: String, debug: Boolean = true) {
          if (debug) {
             Log.i("Xposed", "DownloadRedirect -> $str")
          }
@@ -194,7 +193,8 @@ class MainUi : AnkoComponent<Main> {
    }
 
    override fun createView(ui: AnkoContext<Main>) = with(ui) {
-      val Pref = ConfigDAO(ctx.getSharedPreferences("pref", if(Const.VER_GE_N) 0 else 1))
+      val Pref = ConfigDAO.getPref(ctx)
+      val DEBUG = Pref.Debug
       val af = Pref.AppFilter
       val lf = Pref.LinkFilter
       val ColumnHeight = dip(48)
@@ -488,7 +488,7 @@ class MainUi : AnkoComponent<Main> {
                                           toast(R.string.toast_rule_already_exist)
                                        else -> {
                                           toast(ctx.getString(R.string.toast_added, d))
-                                          Main.log("Added \"$d\" to filter")
+                                          Main.log("Added \"$d\" to filter", DEBUG)
                                           lf.add(d)
                                           Pref.updateLinkFilter()
                                           x.add(d)
@@ -552,11 +552,11 @@ class MainUi : AnkoComponent<Main> {
                            val cla = CheckableListAdapter(appList, ctx) { adapter, view, pos, isChecked ->
                               val item = adapter.getItem(pos)!!.split("\n ")
                               if (item[1] in af) {
-                                 Main.log("Removed '${item[0]} | ${item[1]}' from filter")
+                                 Main.log("Removed '${item[0]} | ${item[1]}' from filter", DEBUG)
                                  toast(ctx.getString(R.string.toast_removed, item[0]))
                                  af.remove(item[1])
                               } else {
-                                 Main.log("Added '${item[0]} | ${item[1]}' to filter")
+                                 Main.log("Added '${item[0]} | ${item[1]}' to filter", DEBUG)
                                  toast(ctx.getString(R.string.toast_added, item[0]))
                                  af.add(item[1])
                               }

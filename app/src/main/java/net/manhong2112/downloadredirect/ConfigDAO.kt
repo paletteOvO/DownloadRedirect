@@ -7,23 +7,28 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import de.robv.android.xposed.XSharedPreferences
 import net.manhong2112.downloadredirect.DLApi.DownloadConfig
 import java.util.*
+import android.content.Context
+import android.content.Context.MODE_WORLD_READABLE
 
 /**
  * Created by manhong2112 on 18/7/2016.
  * config manager
  */
 
-class ConfigDAO(pref: SharedPreferences) {
+class ConfigDAO(private val pref: SharedPreferences) {
    companion object {
-      fun getPref(): ConfigDAO {
+      fun getXPref(): ConfigDAO {
          val pref = XSharedPreferences(Const.PACKAGE_NAME, "pref")
          pref.makeWorldReadable()
          pref.reload()
          return ConfigDAO(pref)
       }
+
+      fun getPref(ctx: Context, prefName: String = "pref"): ConfigDAO {
+         return ConfigDAO(ctx.getSharedPreferences(prefName, MODE_WORLD_READABLE))
+      }
    }
 
-   private val Pref = pref
    val DownloadConfigs: HashMap<String, DownloadConfig> by lazy {
       val mapper = ObjectMapper().registerModule(KotlinModule())
       val k = pref.getStringSet("DownloadConfigs", null) ?: return@lazy Const.defaultDownloadConfig
@@ -42,88 +47,77 @@ class ConfigDAO(pref: SharedPreferences) {
          i: DownloadConfig ->
             mapper.writerWithDefaultPrettyPrinter().writeValueAsString(i)
       }.toSet()
-      Pref.edit().putStringSet("DownloadConfigs", set).apply()
+      pref.edit().putStringSet("DownloadConfigs", set).apply()
    }
 
    val LinkFilter by lazy {
-      Pref.getStringSet("LinkFilter", setOf<String>()).toSortedSet()
+      pref.getStringSet("LinkFilter", setOf<String>()).toSortedSet()
    }
 
    val AppFilter by lazy {
-      Pref.getStringSet("AppFilter", setOf<String>()).toSortedSet()
+      pref.getStringSet("AppFilter", setOf<String>()).toSortedSet()
    }
 
-   var Experiment = Pref.getBoolean("Experiment", false)
-      get() = field
+   var Experiment = pref.getBoolean("Experiment", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("Experiment", b).apply()
+         pref.edit().putBoolean("Experiment", b).apply()
       }
 
-   var NotSpecifyDownloader = Pref.getBoolean("NotSpecifyDownloader", false)
-      get() = field
+   var NotSpecifyDownloader = pref.getBoolean("NotSpecifyDownloader", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("NotSpecifyDownloader", b).apply()
+         pref.edit().putBoolean("NotSpecifyDownloader", b).apply()
       }
 
-   var Debug = Pref.getBoolean("Debug", false)
-      get() {
-         return field
-      }
+   var Debug = pref.getBoolean("Debug", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("Debug", b).apply()
+         pref.edit().putBoolean("Debug", b).apply()
       }
 
-   var HideIcon = Pref.getBoolean("HideIcon", false)
-      get() = field
+   var HideIcon = pref.getBoolean("HideIcon", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("HideIcon", b).apply()
+         pref.edit().putBoolean("HideIcon", b).apply()
       }
 
-   var SelectedDownloader: DownloadConfig = DownloadConfigs[Pref.getString("SelectedDownloader", "ADM")]!!
-      get() = field
+   var SelectedDownloader: DownloadConfig = DownloadConfigs[pref.getString("SelectedDownloader", "ADM")]!!
       set(s) {
          field = s
-         Pref.edit().putString("SelectedDownloader", s.name).apply()
+         pref.edit().putString("SelectedDownloader", s.name).apply()
       }
 
-   var UsingWhiteList_Link = Pref.getBoolean("UsingWhiteList_Link", false)
-      get() = field
+   var UsingWhiteList_Link = pref.getBoolean("UsingWhiteList_Link", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("UsingWhiteList_Link", b).apply()
+         pref.edit().putBoolean("UsingWhiteList_Link", b).apply()
       }
 
-   var UsingWhiteList_App = Pref.getBoolean("UsingWhiteList_App", false)
-      get() = field
+   var UsingWhiteList_App = pref.getBoolean("UsingWhiteList_App", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("UsingWhiteList_App", b).apply()
+         pref.edit().putBoolean("UsingWhiteList_App", b).apply()
       }
 
-   var IgnoreSystemApp = Pref.getBoolean("IgnoreSystemApp", false)
-      get() = field
+   var IgnoreSystemApp = pref.getBoolean("IgnoreSystemApp", false)
       set(b) {
          field = b
-         Pref.edit().putBoolean("IgnoreSystemApp", b).apply()
+         pref.edit().putBoolean("IgnoreSystemApp", b).apply()
       }
 
-   var FirstRun = Pref.getBoolean("FirstRun", true)
-      get() = field
+   var FirstRun = pref.getBoolean("FirstRun", true)
       set(b) {
          field = b
-         Pref.edit().putBoolean("FirstRun", b).apply()
+         pref.edit().putBoolean("FirstRun", b).apply()
       }
 
    fun updateLinkFilter() {
-      Pref.edit().putStringSet("LinkFilter", LinkFilter.toSet()).apply()
+      pref.edit().putStringSet("LinkFilter", LinkFilter.toSet()).apply()
    }
 
    fun updateAppFilter() {
-      Pref.edit().putStringSet("AppFilter", AppFilter.toSet()).apply()
+      pref.edit().putStringSet("AppFilter", AppFilter.toSet()).apply()
    }
 
 }

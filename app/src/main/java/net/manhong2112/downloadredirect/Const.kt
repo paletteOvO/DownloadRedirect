@@ -1,7 +1,6 @@
 package net.manhong2112.downloadredirect
 
 import android.os.Build
-import android.os.Environment
 import net.manhong2112.downloadredirect.DLApi.*
 import java.util.*
 
