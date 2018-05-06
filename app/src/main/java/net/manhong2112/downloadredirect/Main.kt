@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
+import android.content.DialogInterface
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -28,7 +29,6 @@ import org.jetbrains.anko.*
  * Created by manhong2112 on 10/4/2016.
  * Setting Page
  */
-
 
 class Main : Activity() {
    override fun onCreate(bundle: Bundle?) {
@@ -58,14 +58,14 @@ class Main : Activity() {
 
       fun hideIcon(ctx: Context) {
          ctx.packageManager.setComponentEnabledSetting(
-               ComponentName(ctx, "net.manhong2112.downloadredirect.Main-Icon"),
+               ComponentName(ctx, "net.manhong2112.downloadredirect.MainIcon"),
                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                PackageManager.DONT_KILL_APP)
       }
 
       fun displayIcon(ctx: Context) {
          ctx.packageManager.setComponentEnabledSetting(
-               ComponentName(ctx, "net.manhong2112.downloadredirect.Main-Icon"),
+               ComponentName(ctx, "net.manhong2112.downloadredirect.MainIcon"),
                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                PackageManager.DONT_KILL_APP)
       }
@@ -123,28 +123,27 @@ class MainUi : AnkoComponent<Main> {
 
    fun _RelativeLayout.prefSwitch(viewId: Int, textResId: Int, init: Switch.() -> Unit = {}) = prefSwitch(viewId, resources.getString(textResId), init)
 
-   fun AnkoContext<*>.showAlert(message: Int, title: Int?, dsl: AlertDialogBuilder.() -> Unit = {}): AlertDialogBuilder {
-      return alert(message, title) {
+   fun AnkoContext<*>.showAlert(message: Int, title: Int?, dsl: AlertBuilder<DialogInterface>.() -> Unit = {}) =
+      alert(message, title) {
          dsl()
       }.show()
-   }
 
-   inline fun AnkoContext<*>.showAlert(crossinline dsl: AlertDialogBuilder.() -> Unit): AlertDialogBuilder {
-      return alert {
+   inline fun AnkoContext<*>.showAlert(crossinline dsl: AlertBuilder<DialogInterface>.() -> Unit) =
+      alert {
          dsl()
       }.show()
-   }
 
-   inline fun AnkoContext<*>.showCustomAlert(crossinline dsl: AlertDialogBuilder.() -> ViewManager.() -> Unit): AlertDialogBuilder {
-      return alert {
+
+   inline fun AnkoContext<*>.showCustomAlert(crossinline dsl: AlertBuilder<DialogInterface>.() -> ViewManager.() -> Unit) =
+       alert {
          customView {
             dsl()()
          }
       }.show()
-   }
 
-   fun AnkoContext<*>.downloaderConfigEditDialog(init: DownloadConfig? = null, callback: (DownloadConfig) -> Unit): AlertDialogBuilder {
-      var g: (() -> Unit)? = null
+
+   fun AnkoContext<*>.downloaderConfigEditDialog(init: DownloadConfig? = null, callback: (DownloadConfig) -> Unit): DialogInterface {
+      var g: (DialogInterface.() -> Unit)? = null
       val k = showCustomAlert {{
             verticalLayout {
                padding = dip(16)
@@ -178,8 +177,8 @@ class MainUi : AnkoComponent<Main> {
                            name.text.toString(),
                            packageName.text.toString(),
                            intent.text.toString(),
-                           listOf("Cookie" to cookies.text.toString(),
-                                 "Referer" to referer.text.toString())
+                           listOf(Pair("Cookie", cookies.text.toString()),
+                                 Pair("Referer", referer.text.toString()))
                      ))
                      dismiss()
                   }
@@ -187,8 +186,12 @@ class MainUi : AnkoComponent<Main> {
             }
          }
       }
-      k.dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-      k.dialog!!.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { g!!() }
+      (k as AlertDialog).run {
+         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+         getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            g!!(k)
+         }
+      }
       return k
    }
 
@@ -228,7 +231,7 @@ class MainUi : AnkoComponent<Main> {
                   height = ColumnHeight
                   below(Const.id.Debug_Label)
                }
-               onClick {
+               setOnClickListener {
                   Pref.Debug = (it as Switch).isChecked
                }
             }
@@ -240,7 +243,7 @@ class MainUi : AnkoComponent<Main> {
                   height = ColumnHeight
                   below(Const.id.Debug_Logging_Switch)
                }
-               onClick {
+               setOnClickListener {
                   Pref.Experiment = (it as Switch).isChecked
                }
             }
@@ -254,7 +257,7 @@ class MainUi : AnkoComponent<Main> {
 
             prefSwitch(Const.id.Pref_HideIcon_Switch, R.string.switch_hide_app_icon) {
                isChecked = Pref.HideIcon
-               onClick {
+               setOnClickListener {
                   it as Switch
                   Pref.HideIcon = it.isChecked
                   if (it.isChecked) {
@@ -273,7 +276,7 @@ class MainUi : AnkoComponent<Main> {
 
             prefSwitch(Const.id.Pref_Ignore_System_App, R.string.switch_ignore_system_app) {
                isChecked = Pref.IgnoreSystemApp
-               onClick {
+               setOnClickListener {
                   Pref.IgnoreSystemApp = (it as Switch).isChecked
                }
                lparams {
@@ -286,7 +289,7 @@ class MainUi : AnkoComponent<Main> {
 
             prefSwitch(Const.id.Pref_NotSpecifyDownloader_Switch, R.string.switch_not_specify_downloader) {
                isChecked = Pref.NotSpecifyDownloader
-               onClick {
+               setOnClickListener {
                   Pref.NotSpecifyDownloader = (it as Switch).isChecked
                }
                lparams {
@@ -313,36 +316,33 @@ class MainUi : AnkoComponent<Main> {
                   alignParentLeft()
                   below(Const.id.Pref_NotSpecifyDownloader_Switch)
                }
-               onClick {
-                  showCustomAlert {
+               setOnClickListener {
+                  lateinit var dialog: DialogInterface
+                  dialog = showCustomAlert {
                      {
                         verticalLayout {
                            lparams {
                               height = matchParent
                               verticalPadding = dip(16)
                            }
-                           title(R.string.selector_downloader)
+                           titleResource = R.string.selector_downloader
                            val j = listView {
                               divider = null
                               isVerticalScrollBarEnabled = false
-                              lparams {
-                                 height = 0
-                                 weight = 1f
-                                 width = matchParent
-                              }
+
                               adapter = ArrayAdapter(ctx, android.R.layout.simple_list_item_1, Pref.DownloadConfigs.keys.sorted())
-                              onItemClick { adapterView, view, i, id ->
+                              setOnItemClickListener { adapterView, view, i, id ->
                                  adapterView!!
                                  val downloader = Pref.DownloadConfigs[adapterView.getItemAtPosition(i) as String]!!
                                  toast("Selected ${downloader.name}")
                                  b.text = downloader.name
                                  Pref.SelectedDownloader = downloader
-                                 dismiss()
+                                 dialog.dismiss()
                               }
 
-                              onItemLongClick { adapterView, view, i, id ->
+                              setOnItemLongClickListener { adapterView, view, i, id ->
                                  adapterView!!
-                                 selector("", listOf("Edit", "Delete")) { index ->
+                                 selector("", listOf("Edit", "Delete")) { _, index ->
                                     val name = adapterView.getItemAtPosition(i) as String
                                     when (index) {
                                        0 ->
@@ -359,10 +359,14 @@ class MainUi : AnkoComponent<Main> {
                                  }
                                  true
                               }
+                           }.lparams {
+                              height = 0
+                              weight = 1f
+                              width = matchParent
                            }
                            button {
                               text = "Add"
-                              onClick {
+                              setOnClickListener {
                                  downloaderConfigEditDialog { config ->
                                     Pref.DownloadConfigs[config.name] = config
                                     Pref.updateDownloadConfigs()
@@ -390,10 +394,10 @@ class MainUi : AnkoComponent<Main> {
                   height = ColumnHeight
                   below(Const.id.Filter_Label)
                }
-               onClick {
+               setOnClickListener {
                   showCustomAlert {{
                         verticalLayout {
-                           title(R.string.selector_whitelist)
+                           titleResource = R.string.selector_whitelist
                            val choiceList = arrayListOf(
                                  ctx.getString(R.string.filter_link),
                                  ctx.getString(R.string.filter_app))
@@ -408,13 +412,12 @@ class MainUi : AnkoComponent<Main> {
                            listView {
                               divider = null
                               isVerticalScrollBarEnabled = false
-                              lparams {
-                                 padding = dip(4)
-                                 height = 0
-                                 weight = 1f
-                                 width = matchParent
-                              }
                               adapter = aa
+                           }.lparams {
+                              padding = dip(4)
+                              height = 0
+                              weight = 1f
+                              width = matchParent
                            }
                         }
                      }
@@ -429,8 +432,8 @@ class MainUi : AnkoComponent<Main> {
                   alignParentLeft()
                   below(Const.id.Pref_Use_White_List)
                }
-               onClick {
-                  showCustomAlert {
+               setOnClickListener {
+                  val dialog = showCustomAlert {
                      {
                         verticalLayout {
                            lparams {
@@ -439,17 +442,13 @@ class MainUi : AnkoComponent<Main> {
                            }
                            val x = ArrayList<String>(lf)
                            val aa = ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, x)
-                           title(R.string.list_filter_link)
+                           titleResource = R.string.list_filter_link
                            listView {
                               divider = null
                               isVerticalScrollBarEnabled = false
-                              lparams {
-                                 height = 0
-                                 weight = 1f
-                                 width = matchParent
-                              }
+
                               adapter = aa
-                              onItemClick { parent, view, position, id ->
+                              setOnItemClickListener { parent, view, position, id ->
                                  alert("Are you sure to remove") {
                                     positiveButton(android.R.string.yes) {
                                        val item = aa.getItem(position)
@@ -459,9 +458,13 @@ class MainUi : AnkoComponent<Main> {
                                        x.remove(item)
                                        aa.notifyDataSetChanged()
                                     }
-                                    negativeButton(android.R.string.no)
+                                    negativeButton(android.R.string.no, {it.dismiss()})
                                  }.show()
                               }
+                           }.lparams {
+                              height = 0
+                              weight = 1f
+                              width = matchParent
                            }
                            linearLayout {
                               lparams {
@@ -472,14 +475,13 @@ class MainUi : AnkoComponent<Main> {
                               val link = editText {
                                  maxLines = 1
                                  inputType = android.text.InputType.TYPE_CLASS_TEXT
-                                 lparams {
-                                    weight = 1f
-                                 }
                                  hint = ctx.getString(R.string.label_regex)
+                              }.lparams {
+                                 weight = 1f
                               }
                               button {
                                  text = ctx.getString(R.string.button_add)
-                                 onClick {
+                                 setOnClickListener {
                                     val d = link.text.trim().toString()
                                     when (true) {
                                        d.isEmpty() ->
@@ -501,8 +503,8 @@ class MainUi : AnkoComponent<Main> {
                            }
                         }
                      }
-
-                  }.dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                  }
+                  (dialog as AlertDialog).window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
                }
             }
 
@@ -513,8 +515,8 @@ class MainUi : AnkoComponent<Main> {
                   alignParentLeft()
                   below(Const.id.Link_Filter)
                }
-               onClick {
-                  showCustomAlert {{
+               setOnClickListener {
+                  val dialog = showCustomAlert {{
                         verticalLayout {
                            lparams {
                               height = matchParent
@@ -565,24 +567,20 @@ class MainUi : AnkoComponent<Main> {
                            for (i in 0 until af.size) {
                               cla.isSelected[i] = true
                            }
-                           title(R.string.list_filter_app)
+                           titleResource = R.string.list_filter_app
                            listView {
                               divider = null
                               isVerticalScrollBarEnabled = false
-                              lparams {
-                                 height = 0
-                                 weight = 1f
-                                 width = matchParent
-                              }
                               adapter = cla
+                           }.lparams {
+                              height = 0
+                              weight = 1f
+                              width = matchParent
                            }
                            editText {
                               maxLines = 1
                               inputType = android.text.InputType.TYPE_CLASS_TEXT
-                              lparams {
-                                 width = matchParent
-                                 horizontalMargin = dip(4)
-                              }
+
                               hint = ctx.getString(R.string.label_search)
                               addTextChangedListener(object : TextWatcher {
                                  override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -595,10 +593,14 @@ class MainUi : AnkoComponent<Main> {
                                     cla.filter.filter(cs)
                                  }
                               })
+                           }.lparams {
+                              width = matchParent
+                              horizontalMargin = dip(4)
                            }
                         }
                      }
-                  }.dialog!!.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                  }
+                  (dialog as AlertDialog).window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
                }
             }
 

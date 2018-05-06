@@ -22,7 +22,7 @@
         </activity>
         <activity-alias
                 android:enabled="true"
-                android:name=".Main-Icon"
+                android:name=".MainIcon"
                 android:targetActivity=".Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

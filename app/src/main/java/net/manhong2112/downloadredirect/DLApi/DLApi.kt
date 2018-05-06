@@ -14,17 +14,8 @@ import net.manhong2112.downloadredirect.ConfigDAO
 typealias Name = String
 typealias Value = String
 typealias Header = List<Pair<String, String>>
-
 object DLApi {
-   operator fun <F, S> android.util.Pair<F, S>.component1(): F {
-      return this.first
-   }
-
-   operator fun <F, S> android.util.Pair<F, S>.component2(): S {
-      return this.second
-   }
-
-   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<android.util.Pair<String, String>>): Boolean {
+   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<Pair<String, String>>): Boolean {
       val Pref = ConfigDAO.getXPref()
       val DEBUG = Pref.Debug
       Main.log("addDownload(Context, Uri, List)", DEBUG)
@@ -61,7 +52,7 @@ object DLApi {
       }
    }
 
-   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<android.util.Pair<String, String>>, downloadConfig: DownloadConfig): Boolean {
+   fun addDownload(ctx: Context, url: Uri, mRequestHeaders: List<Pair<String, String>>, downloadConfig: DownloadConfig): Boolean {
       val Pref = ConfigDAO.getXPref()
       val DEBUG = Pref.Debug
       Main.log("addDownload(Context, Uri, List, DownloadConfig)", DEBUG)

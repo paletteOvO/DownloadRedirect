@@ -83,7 +83,7 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          val DEBUG = Pref.Debug
          log("received download request", DEBUG)
          val mUri = getObjectField(param.args[0], "mUri") as Uri
-         val mRequestHeaders = getObjectField(param.args[0], "mRequestHeaders") as List<android.util.Pair<String, String>>
+         val mRequestHeaders = getObjectField(param.args[0], "mRequestHeaders") as List<Pair<String, String>>
 
          when(true) {
             (Pref.IgnoreSystemApp &&
@@ -139,8 +139,8 @@ class XposedHook : IXposedHookZygoteInit, IXposedHookLoadPackage {
          log("NotSpecifyDownloader -> ${Pref.NotSpecifyDownloader}", DEBUG)
 
          val v = if(Pref.NotSpecifyDownloader)
-                  DLApi.addDownload(ctx, mUri, mRequestHeaders)
-                 else (DLApi.addDownload(ctx, mUri, mRequestHeaders, selectedDownloader) || DLApi.addDownload(ctx, mUri, mRequestHeaders))
+            DLApi.addDownload(ctx, mUri, mRequestHeaders)
+         else (DLApi.addDownload(ctx, mUri, mRequestHeaders, selectedDownloader) || DLApi.addDownload(ctx, mUri, mRequestHeaders))
          log("Redirection: ${if (v) "Success" else "Failed"}", DEBUG)
          if (v) {
             param.result = 0

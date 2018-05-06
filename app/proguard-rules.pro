@@ -18,17 +18,25 @@
 -verbose
 -dontnote **
 -dontwarn **
--keep class net.manhong2112.downloadredirect.XposedHook {*;}
--keep class net.manhong2112.downloadredirect.DLApi.DownloadConfig {*;}
+-keepattributes SourceFile,LineNumberTable
+
+-renamesourcefileattribute ''
+-repackageclasses ''
+-allowaccessmodification
 
 -optimizationpasses 99
--dontoptimize
 
--keep class kotlin.Metadata { *; }
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
 
--keepattributes *Annotation*
--keep class org.jetbrains.kotlin.** { *; }
--keep class org.jetbrains.annotations.** { *; }
--keepclassmembers class ** {
-  @org.jetbrains.annotations.ReadOnly public *;
+-dontwarn android.support.**
+
+-keep class ** implements de.robv.android.xposed.IXposedHookLoadPackage {
+     public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage$LoadPackageParam);
 }
+
+-keep class net.manhong2112.downloadredirect.DLApi.DownloadConfig { *; }
+-keep class kotlin.reflect.** { *; }
+-keep class kotlin.internal.** { *; }
+-keep class kotlin.* { *; }
+-optimizationpasses 99

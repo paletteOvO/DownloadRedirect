@@ -9,6 +9,7 @@ import net.manhong2112.downloadredirect.DLApi.DownloadConfig
 import java.util.*
 import android.content.Context
 import android.content.Context.MODE_WORLD_READABLE
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 /**
  * Created by manhong2112 on 18/7/2016.
@@ -30,7 +31,7 @@ class ConfigDAO(private val pref: SharedPreferences) {
    }
 
    val DownloadConfigs: HashMap<String, DownloadConfig> by lazy {
-      val mapper = ObjectMapper().registerModule(KotlinModule())
+      val mapper = jacksonObjectMapper()
       val k = pref.getStringSet("DownloadConfigs", null) ?: return@lazy Const.defaultDownloadConfig
       val map = HashMap<String, DownloadConfig>()
       k.forEach {
